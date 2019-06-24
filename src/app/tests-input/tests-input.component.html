@@ -1,0 +1,133 @@
+<div class="tests-input">
+   <div class="table">
+      <div class="row head">
+         <div class="td count">№ зразка</div>
+         <div class="td control">Control</div>
+         <div class="td test-result" *ngFor="let test of tests; let i = index">Test {{i + 1}}</div>
+
+         <div class="td new-test-header" *ngIf="showInputColumn">Test {{tests.length + 1}}</div>
+      </div>
+
+      <div class="row complete-row" *ngFor="let sample of samples; let i = index">
+         <div class="td count">{{i + 1}}</div>
+         <div class="td control">{{sample ? '+' : '-'}}</div>
+         <div class="td test-result" *ngFor="let test of tests">
+            <span *ngIf="resultsType === 'binary'">{{test.results[i] ? '+' : '-'}}</span>
+            <span *ngIf="resultsType === 'continuous'">{{test.results[i]}}</span>
+         </div>
+
+         <div class="td new-test-result" *ngIf="showInputColumn">
+            <div class="binary-result-input" *ngIf="resultsType === 'binary'">
+               <button class="positive"
+                       [class.active]="newTest[i]"
+                       (click)="newTest[i] = true; checkSaveState('column')"
+               >+</button>
+               <button class="negative"
+                       [class.active]="newTest[i] !== null && !newTest[i]"
+                       (click)="newTest[i] = false; checkSaveState('column')"
+               >-</button>
+            </div>
+
+            <div class="continuous-result-input" *ngIf="resultsType === 'continuous'">
+               <input type="number" [(ngModel)]="newTest[i]" (ngModelChange)="checkSaveState('column')">
+            </div>
+         </div>
+      </div>
+
+      <div class="row new-row" *ngIf="showInputRow">
+         <div class="td count">{{samples.length + 1}}</div>
+
+         <div class="td control">
+            <div class="binary-result-input">
+               <button class="positive"
+                       [class.active]="newSample.control"
+                       (click)="newSample.control = true"
+               >+</button>
+               <button class="negative"
+                       [class.active]="newSample.control !== null && !newSample.control"
+                       (click)="newSample.control = false"
+               >-</button>
+            </div>
+         </div>
+
+         <div class="td test-result" *ngFor="let test of tests; let i = index">
+            <div class="binary-result-input" *ngIf="resultsType === 'binary'">
+               <button class="positive"
+                       [class.active]="newSample.testsResults[i]"
+                       (click)="newSample.testsResults[i] = true; checkSaveState('row')"
+               >+</button>
+               <button class="negative"
+                       [class.active]="newSample.testsResults[i] !== null && !newSample.testsResults[i]"
+                       (click)="newSample.testsResults[i] = false; checkSaveState('row')"
+               >-</button>
+            </div>
+
+            <div class="continuous-result-input" *ngIf="resultsType === 'continuous'">
+               <input type="number" [(ngModel)]="newSample.testsResults[i]" (ngModelChange)="checkSaveState('row')">
+            </div>
+         </div>
+      </div>
+
+      <div class="save-cancel-btns">
+         <button class="add-row" *ngIf="!showInputRow && !showInputColumn" (click)="addRow()">Add row</button>
+         <button class="save" [disabled]="saveDisabled" *ngIf="showInputRow || showInputColumn" (click)="saveInput()">Save</button>
+         <button class="cancel" *ngIf="showInputRow || showInputColumn" (click)="cancelInput()">Cancel</button>
+      </div>
+
+      <button class="add-column" *ngIf="!showInputColumn && !showInputRow" (click)="addTest()">Add test</button>
+
+      <div class="results-type-switcher">
+         <button (click)="setTypeBinary()" [class.active]="resultsType === 'binary'">Binary</button>
+         <button (click)="setTypeContinuous()" [class.active]="resultsType === 'continuous'">Continuous</button>
+      </div>
+   </div>
+
+   <div class="table characteristics">
+      <div class="calculate-chars">
+         <button (click)="calculateAllTestsCharacteristics()" [disabled]="resultsType === 'continuous' && !threshold">Calculate</button>
+         <div *ngIf="resultsType === 'continuous'" class="threshold">Threshold: <input type="number" [(ngModel)]="threshold"></div>
+      </div>
+
+      <div class="row head">
+         <div class="td"></div>
+         <div class="td" *ngFor="let test of tests; let i = index">Test {{i+1}}</div>
+      </div>
+
+
+      <div class="row">
+         <div class="td">Ac</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.ac | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Se</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.se | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Sp</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.sp | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">PPV</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.ppv | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">NPV</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.npv | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">LR+</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.lrPositive | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">LR-</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.lrNegative | number}}</div>
+      </div>
+   </div>
+
+</div>
