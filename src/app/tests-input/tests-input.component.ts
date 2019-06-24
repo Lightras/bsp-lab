@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as Highcharts from 'highcharts';
 
 @Component({
    selector: 'app-tests-input',
@@ -9,10 +10,12 @@ export class TestsInputComponent implements OnInit {
 
    constructor() { }
 
+   showCurves: boolean;
+
    tests: Test[];
    samples: boolean[];
    resultsType: 'binary' | 'continuous';
-   threshold: number;
+   cutOff: number;
 
    newTest: boolean[];
    newSample: NewSample;
@@ -21,10 +24,25 @@ export class TestsInputComponent implements OnInit {
    showInputColumn: boolean;
    saveDisabled: boolean;
 
+   min: number;
+   max: number;
+   stepsNumber: number;
+   cutOffsArray: number[];
+   distances: number[] = [];
+   optimalCutOff: {
+      value: number;
+      distance: number;
+   };
+
    currentInputType: 'row' | 'column';
 
    ngOnInit() {
-      this.resultsType = 'binary';
+      this.resultsType = 'continuous';
+      this.stepsNumber = 10;
+      this.optimalCutOff = {
+         value: null,
+         distance: null
+      };
 
       this.tests = [
          {
@@ -48,7 +66,7 @@ export class TestsInputComponent implements OnInit {
       let results;
 
       if (this.resultsType === 'continuous') {
-         results = test.results.map(r => r >= this.threshold);
+         results = test.results.map(r => r >= this.cutOff);
       } else {
          results = test.results;
       }
@@ -67,8 +85,6 @@ export class TestsInputComponent implements OnInit {
          lrPositive: (test.TP / (test.TP + test.FN)) / (test.FP / (test.FP + test.TN)),
          lrNegative: (test.FN / (test.TP + test.FN)) / (test.TN / (test.FP + test.TN))
       };
-
-      console.log('test: ', test);
    }
 
    refreshNewSample() {
@@ -171,6 +187,41 @@ export class TestsInputComponent implements OnInit {
       }
    }
 
+   calculateOptimalPair() {
+      this.min = Math.min(...this.tests.map(t => Math.min(... t.results as number[])));
+      this.max = Math.max(...this.tests.map(t => Math.max(... t.results as number[])));
+
+      this.cutOffsArray = [];
+      
+      let i = 0;
+      const step = (this.max - this.min) / this.stepsNumber;
+      while (i < this.stepsNumber) {
+         this.cutOffsArray.push(this.min + i * step);
+         i++;
+      }
+      this.cutOffsArray.push(this.max);
+
+      this.tests.forEach(t => t.chartData = {x: [], y: []});
+
+      this.cutOffsArray.forEach((cutOff, index) => {
+         this.cutOff = cutOff;
+         this.calculateAllTestsCharacteristics();
+
+         this.tests.forEach((t, j) => {
+            this.distances.push(Math.sqrt(Math.pow(1 - t.characteristics.se, 2) + Math.pow(1 - t.characteristics.sp, 2)));
+
+            this.tests[j].chartData.x.push(1 - t.characteristics.sp);
+            this.tests[j].chartData.y.push(t.characteristics.se);
+         });
+
+         this.optimalCutOff.distance = Math.min(... this.distances);
+         this.optimalCutOff.value = this.cutOffsArray[this.distances.indexOf(this.optimalCutOff.distance)];
+      });
+
+      console.log('this.tests: ', this.tests);
+      this.showCurves = true;
+   }
+
 }
 
 interface Test {
@@ -189,7 +240,11 @@ interface Test {
       npv: number;
       lrPositive: number;
       lrNegative: number;
+      distance?: number;
    };
+
+   chartData?: any;
+   chartDataItem?: any;
 }
 
 interface NewSample {

@@ -82,10 +82,10 @@
       </div>
    </div>
 
-   <div class="table characteristics">
+   <div class="table characteristics" *ngIf="this.resultsType === 'binary'">
       <div class="calculate-chars">
-         <button (click)="calculateAllTestsCharacteristics()" [disabled]="resultsType === 'continuous' && !threshold">Calculate</button>
-         <div *ngIf="resultsType === 'continuous'" class="threshold">Threshold: <input type="number" [(ngModel)]="threshold"></div>
+         <button (click)="calculateAllTestsCharacteristics()" [disabled]="resultsType === 'continuous' && !cutOff">Calculate</button>
+         <div *ngIf="resultsType === 'continuous'" class="threshold">Threshold: <input type="number" [(ngModel)]="cutOff"></div>
       </div>
 
       <div class="row head">
@@ -127,6 +127,22 @@
       <div class="row">
          <div class="td">LR-</div>
          <div class="td" *ngFor="let test of tests">{{test.characteristics?.lrNegative | number}}</div>
+      </div>
+   </div>
+
+   <div class="continuous-block" *ngIf="this.resultsType === 'continuous'">
+      <button (click)="calculateOptimalPair()">Find optimum</button>
+
+      <div class="cutoff">
+         <div>Optimal cutoff based on distance:</div>
+         <br>
+         <div>Cutoff: {{optimalCutOff.value}}</div>
+         <div>Distance: {{optimalCutOff.distance}}</div>
+      </div>
+
+
+      <div *ngIf="showCurves">
+         <app-roc *ngFor="let test of tests" [chartData]="test.chartData"></app-roc>
       </div>
    </div>
 
