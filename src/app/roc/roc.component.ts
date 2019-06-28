@@ -8,6 +8,7 @@ import * as Highcharts from 'highcharts';
 })
 export class RocComponent implements OnInit {
    @Input('chartData') chartData: any;
+   @Input('index') index: number;
 
    constructor() { }
 
@@ -16,13 +17,23 @@ export class RocComponent implements OnInit {
 
    ngOnInit() {
       this.chartOptions = {
+         credits: {
+            enabled: false
+         },
+
          title: {
-            text: 'ROC-curve'
+            text: 'ROC-curve of test #' + (this.index + 1)
+         },
+
+         xAxis: {
+            title: {
+               text: '1 - Sp'
+            }
          },
 
          yAxis: {
             title: {
-               text: 'y'
+               text: 'Se'
             }
          },
 
@@ -35,10 +46,10 @@ export class RocComponent implements OnInit {
          },
 
          series: [{
-            data: this.chartData.x.map((v, i) => {
+            data: (this.chartData.x.map((v, i) => {
                return {x: v, y: this.chartData.y[i]};
-            })
-         }]
+            }).sort((a, b) => a.x - b.x)
+)         }]
       };
 
       console.log('this.chartOptions: ', this.chartOptions.series[0].data);

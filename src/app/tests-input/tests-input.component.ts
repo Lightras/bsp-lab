@@ -17,6 +17,8 @@ export class TestsInputComponent implements OnInit {
    resultsType: 'binary' | 'continuous';
    cutOff: number;
 
+   testTypes: any[];
+
    newTest: boolean[];
    newSample: NewSample;
 
@@ -32,30 +34,35 @@ export class TestsInputComponent implements OnInit {
    optimalCutOff: {
       value: number;
       distance: number;
+      se: number;
+      sp: number;
    };
 
    currentInputType: 'row' | 'column';
 
    ngOnInit() {
-      this.resultsType = 'continuous';
-      this.stepsNumber = 10;
-      this.optimalCutOff = {
-         value: null,
-         distance: null
-      };
-
-      this.tests = [
+      this.testTypes = [
          {
-            results: [true, true, false, true, false]
+            name: 'binary',
+            label: 'Бінарний'
          },
          {
-            results: [false, true, false, true, true]
+            name: 'continuous',
+            label: 'Неперервний'
          }
       ];
 
+      this.stepsNumber = 10;
+      this.optimalCutOff = {
+         value: null,
+         distance: null,
+         se: null,
+         sp: null
+      };
+
       this.samples = [true, false, false, true, false];
 
-      this.refreshNewSample();
+      this.setTypeContinuous();
    }
 
    calculateAllTestsCharacteristics() {
@@ -168,12 +175,31 @@ export class TestsInputComponent implements OnInit {
       this.calculateTestCharacteristics(this.tests.slice(-1)[0]);
    }
 
+   setTestType(type: string) {
+      if (type === 'binary') {
+         this.setTypeBinary();
+      } else if (type === 'continuous') {
+         this.setTypeContinuous();
+      }
+   }
+
    setTypeBinary() {
+      this.tests = [
+         {
+            results: [true, true, false, true, false]
+         },
+         {
+            results: [false, true, false, true, true]
+         }
+      ];
+
       this.resultsType = 'binary';
    }
 
    setTypeContinuous() {
+      console.log('setTypeContinuous: ');
       if (this.resultsType !== 'continuous') {
+         console.log('in work');
          this.resultsType = 'continuous';
 
          this.tests = [
@@ -207,15 +233,22 @@ export class TestsInputComponent implements OnInit {
          this.cutOff = cutOff;
          this.calculateAllTestsCharacteristics();
 
+         this.tests.forEach(t => t.optimum = {distance: Number.POSITIVE_INFINITY});
+
          this.tests.forEach((t, j) => {
-            this.distances.push(Math.sqrt(Math.pow(1 - t.characteristics.se, 2) + Math.pow(1 - t.characteristics.sp, 2)));
+            const distance = Math.sqrt(Math.pow(1 - t.characteristics.se, 2) + Math.pow(1 - t.characteristics.sp, 2));
+            if (distance < t.optimum.distance) {
+               t.optimum = {
+                  distance,
+                  cutoff: cutOff,
+                  se: t.characteristics.se,
+                  sp: t.characteristics.sp
+               };
+            }
 
             this.tests[j].chartData.x.push(1 - t.characteristics.sp);
             this.tests[j].chartData.y.push(t.characteristics.se);
          });
-
-         this.optimalCutOff.distance = Math.min(... this.distances);
-         this.optimalCutOff.value = this.cutOffsArray[this.distances.indexOf(this.optimalCutOff.distance)];
       });
 
       console.log('this.tests: ', this.tests);
@@ -241,6 +274,13 @@ interface Test {
       lrPositive: number;
       lrNegative: number;
       distance?: number;
+   };
+
+   optimum?: {
+      cutoff?: number;
+      distance?: number;
+      se?: number;
+      sp?: number;
    };
 
    chartData?: any;

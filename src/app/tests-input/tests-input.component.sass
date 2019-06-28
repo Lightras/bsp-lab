@@ -1,10 +1,32 @@
+$color1: #225378
+$color2: #1695a3
+$color3: #acf0f2
+$color-light: #f3ffe2
+$color-warn: #eb7f00
+
+div
+   display: flex
+   justify-content: center
+   align-items: center
+
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button
    -webkit-appearance: none
    margin: 0
 
 .tests-input
+   font-size: 16px
+   font-family: "Dosis", Arial, Helvetica, sans-serif
    flex-direction: column
+   background: $color3
+
+.input-table
+   .controls
+      position: absolute
+      left: calc(100% + 10px)
+      top: -6px
+      flex-direction: column
 
 .table
    position: relative
@@ -15,8 +37,6 @@ input[type=number]::-webkit-outer-spin-button
    align-items: center
 
    &.characteristics
-      margin-top: 50px
-
       .calculate-chars
          position: absolute
          left: calc(100% + 10px)
@@ -26,18 +46,6 @@ input[type=number]::-webkit-outer-spin-button
 
       .threshold
          margin-top: 10px
-
-.results-type-switcher
-   position: absolute
-   top: -1px
-   right: calc(100% + 10px)
-   flex-direction: column
-
-   button
-      width: 100px
-
-      &.active
-         background: lightgreen
 
 .row
    flex-direction: row
@@ -57,8 +65,28 @@ input[type=number]::-webkit-outer-spin-button
    align-items: center
 
    button
+      width: 30px !important
+      font-size: 25px
+      line-height: 25px
+      font-weight: bold
+      display: flex
+      align-items: center
+      justify-content: center
+      height: 25px
+      margin: 0 1px
+      padding: 0
+      box-shadow: none
+
+      &:first-child
+         border-top-right-radius: 0
+         border-bottom-right-radius: 0
+
+      &:last-child
+         border-top-left-radius: 0
+         border-bottom-left-radius: 0
+
       &.active
-         background: lightgreen
+         background: green
 
 .save-cancel-btns
    position: absolute
@@ -66,12 +94,6 @@ input[type=number]::-webkit-outer-spin-button
    flex-direction: row
    justify-content: space-around
    width: 110px
-
-.add-column
-   position: absolute
-   left: calc(100% + 10px)
-   width: 70px
-   top: -1px
 
 .table
    input
@@ -81,8 +103,63 @@ input[type=number]::-webkit-outer-spin-button
 
 .cutoff
    flex-direction: column
+   width: 100px
    align-items: flex-start
 
 .continuous-block
    flex-direction: column
-   margin-top: 50px
+
+.calculation-results
+   flex-direction: column
+
+.curves-plots
+   margin: 20px 0
+   flex-direction: row
+   align-items: flex-start
+
+.card
+   background: $color-light
+   border-radius: 5px
+   box-shadow: 0 0 5px 0 gray
+   width: 80%
+   margin: 10px
+   padding: 10px
+
+   &.input-card
+      align-items: flex-start
+      min-height: 190px
+
+button
+   border-radius: 5px
+   background: $color1
+   color: white
+   box-shadow: 0 3px 10px 0 gray
+   cursor: pointer
+
+   height: 40px
+   width: 110px !important
+   font-size: 16px
+   margin: 5px
+
+   border: 0
+
+   &:disabled
+      background: lightgray
+      color: black
+      cursor: not-allowed
+
+   &:active
+      outline: none
+      box-shadow: 0 3px 4px 0 gray
+
+   &:focus
+      outline: none
+
+   &:hover
+      background: $color2
+
+
+::ng-deep
+   .ng-select
+      margin-left: 10px
+      width: 140px

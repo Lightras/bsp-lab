@@ -1,0 +1,20 @@
+<div class="compare">
+   <ng-select [clearable]="false" [items]="compareList1" [(ngModel)]="strategy1"></ng-select>
+   <ng-select [clearable]="false" [items]="compareList2" [(ngModel)]="strategy2"></ng-select>
+   <button (click)="compare()">Compare</button>
+</div>
+
+<div class="bounds">
+   <div class="param-bounds">
+      <div class="label"></div>
+      <div class="min"></div>
+      <div class="max"></div>
+   </div>
+</div>
+
+<highcharts-chart [Highcharts]="highcharts" [options]="chartOptions"></highcharts-chart>
+
+<ng-select [clearable]="false"
+   [items]="paramsOrder" (change)="buildChart(paramsOrder.indexOf(currentParam))" [(ngModel)]="currentParam"></ng-select>
+
+
