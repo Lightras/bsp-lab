@@ -18,22 +18,71 @@ export class TreesComponent implements OnInit {
    paramsOrder: string[];
    currentParam: string;
 
-   strategies = [1,2,3,4,5,6,7,8,9,10,11,12];
+   paramsBounds: number[][];
+   paramsDef: number[][];
+   paramsNames: string[];
+
+   strategies = [1,2,3,4,5,6,7,8,9,10];
+   strategiesNames = [
+      'Діагностичні спектри рівні, верифікація негативного результату і-того тесту',
+      'Діагностичні спектри рівні, верифікація позитивного результату і-того тесту',
+      'Діагностичні спектри різні і не перетинаються, верифікація негативного результату і-того тесту',
+      'Діагностичні спектри різні і не перетинаються, верифікація позитивного результату і-того тесту',
+      'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація негативного результату і-того тесту',
+      'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація позитивного результату і-того тесту',
+      'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація негативного результату і-того тесту',
+      'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація позитивного результату і-того тесту',
+      'Діагностичні спектри частково перетинаються, верифікація негативного результату і-того тесту',
+      'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту'
+   ];
+   // 'Паралельна діагностика, діагностичні спектри частково перетинаються'
+
    compareList1: any[];
    compareList2: any[];
+   labelsList1: any[];
+   labelsList2: any[];
    strategy1: number;
    strategy2: number;
 
-   N = 1000;
+   paramsSelectList: any[];
+   compareClicked = false;
+
+   N = 2000;
 
    ngOnInit() {
       this.paramsOrder = ['Pi', 'Pj', 'Sei', 'Sej', 'Spi', 'Spj', 'Utp', 'Ufp', 'Utn', 'Ufn'];
+      this.paramsNames = [
+         'Діагностичний спектр і-того тесту',
+         'Діагностичний спектр j-того тесту',
+         'Чутливість і-того тесту',
+         'Чутливість j-того тесту',
+         'Специфічність і-того тесту',
+         'Специфічність j-того тесту',
+         'Корисність дійснопозитивного результату',
+         'Корисність хибнопозитивного результату',
+         'Корисність дійснонегативного результату',
+         'Корисність хибнонегативного результату'
+      ];
 
-      this.compareList1 = this.strategies;
-      this.compareList2 = this.strategies;
+      this.paramsSelectList = this.paramsOrder.map((p, i) => {
+         return {code: p, label: this.paramsNames[i]};
+      });
 
-      this.strategy1 = 1;
-      this.strategy2 = 2;
+
+
+      
+      this.paramsBounds = [[0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [-1,0], [0,1], [-1,0]];
+      this.paramsDef    = [[0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [-1,0], [0,1], [-1,0]];
+
+      this.compareList1 = this.strategies.map((s, i) => {
+         return {number: s, label: this.strategiesNames[i]};
+      });
+      this.compareList2 = this.strategies.map((s, i) => {
+         return {number: s, label: this.strategiesNames[i]};
+      });
+
+      // this.strategy1 = 1;
+      // this.strategy2 = 2;
 
       this.compare();
    }
@@ -49,6 +98,7 @@ export class TreesComponent implements OnInit {
 
       this.currentParam = 'Pi';
       this.buildChart(0);
+      this.compareClicked = true;
    }
 
    buildChart(i) {
@@ -62,51 +112,109 @@ export class TreesComponent implements OnInit {
          },
 
          title: {
-            text: 'title'
+            text: 'Залежність відношення очікуваних корисностей обраних стратегій від параметрів'
          },
 
          xAxis: {
             title: {
-               text: '1 - Sp'
+               text: ''
             }
          },
 
          yAxis: {
             title: {
-               text: 'Se'
+               text: 'Відношення очікуваних корисностей першої і другої стратегій'
             }
+         },
+
+         legend: {
+            enabled: false
          },
 
          plotOptions: {
             scatter: {
                marker: {
-                  radius: 2
+                  radius: 1.4
                }
             }
          },
 
          series: [{
+            name: '',
             data: this.data.map(p => [p.params[i], p.value])
          }]
       };
    }
 
-
+   selectStrategy(strategyNumber: number, e) {
+      this.compareClicked = false;
+   }
 
    randomize_params(): number[] {
-      return [
-         Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random(),
-         Math.random(), Math.random(), - Math.random(), - Math.random()
-      ];
+      let Pi: number;
+      let Pj: number;
+      let Pij: number;
+
+      // @ts-ignore
+      const params = [];
+      
+      this.paramsBounds.forEach((bound, i) => {
+         params[i] = bound[0] + Math.random() * (bound[1] - bound[0]);
+      });
+
+      Pi = params[0];
+
+      // todo How do we generate params for 2 different strategies?
+      switch (this.strategy1) {
+         case 1:
+         case 2: {
+            Pj = Math.random();
+            break;
+         }
+
+         case 3:
+         case 4: {
+            Pj = (1 - Pi) * Math.random();
+            break;
+         }
+
+         case 5:
+         case 6: {
+            Pj = Pi * Math.random();
+            break;
+         }
+
+         case 7:
+         case 8: {
+            Pj = Math.random();
+            Pi = Pj * Math.random();
+            break;
+         }
+
+         case 9:
+         case 10: {
+            Pij = Pi * Math.random();
+            Pj = Pij + (1 - Pi) * Math.random();
+         }
+
+      }
+
+      params[0] = Pi;
+      params[1] = Pj;
+
+      return params;
    }
 
    calcRelation() {
       let params = new Array(10);
       params = this.randomize_params();
-      console.log('params: ', params);
+
       // @ts-ignore
       const value = this['EU' + this.strategy1](...params) / this['EU' + this.strategy2](...params);
+
+      // todo Why does it produce outstanding values? Do we need these bounds?
       if (value < 5 && value > -5) {
+      // if (true) {
          return {
             params,
             value

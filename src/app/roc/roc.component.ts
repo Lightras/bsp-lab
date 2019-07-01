@@ -7,6 +7,7 @@ import * as Highcharts from 'highcharts';
    styleUrls: ['./roc.component.scss']
 })
 export class RocComponent implements OnInit {
+
    @Input('chartData') chartData: any;
    @Input('index') index: number;
 
@@ -22,18 +23,18 @@ export class RocComponent implements OnInit {
          },
 
          title: {
-            text: 'ROC-curve of test #' + (this.index + 1)
+            text: 'ROC-крива тесту ' + (this.index + 1)
          },
 
          xAxis: {
             title: {
-               text: '1 - Sp'
+               text: '1 - Специфічність'
             }
          },
 
          yAxis: {
             title: {
-               text: 'Se'
+               text: 'Чутливість'
             }
          },
 
@@ -45,7 +46,12 @@ export class RocComponent implements OnInit {
             }
          },
 
+         legend: {
+            enabled: false
+         },
+
          series: [{
+            name: '',
             data: (this.chartData.x.map((v, i) => {
                return {x: v, y: this.chartData.y[i]};
             }).sort((a, b) => a.x - b.x)

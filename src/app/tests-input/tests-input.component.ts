@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import * as Highcharts from 'highcharts';
 
 @Component({
@@ -8,7 +8,9 @@ import * as Highcharts from 'highcharts';
 })
 export class TestsInputComponent implements OnInit {
 
-   constructor() { }
+   constructor(
+      private dc: ChangeDetectorRef
+   ) { }
 
    showCurves: boolean;
 
@@ -60,7 +62,8 @@ export class TestsInputComponent implements OnInit {
          sp: null
       };
 
-      this.samples = [true, false, false, true, false];
+      // this.samples = [true, false, false, true, false];
+      this.samples = [true];
 
       this.setTypeContinuous();
    }
@@ -119,6 +122,7 @@ export class TestsInputComponent implements OnInit {
       } else if (inputType === 'row') {
          this.saveDisabled =
             this.newSample.control === null ||
+            this.newSample.testsResults.length &&
             this.newSample.testsResults.some(r => r === null || typeof r === 'undefined');
       } else {
          this.saveDisabled = true;
@@ -181,36 +185,38 @@ export class TestsInputComponent implements OnInit {
       } else if (type === 'continuous') {
          this.setTypeContinuous();
       }
+      this.dc.detectChanges();
    }
 
    setTypeBinary() {
-      this.tests = [
-         {
-            results: [true, true, false, true, false]
-         },
-         {
-            results: [false, true, false, true, true]
-         }
-      ];
+      // this.tests = [
+      //    {
+      //       results: [true, true, false, true, false]
+      //    },
+      //    {
+      //       results: [false, true, false, true, true]
+      //    }
+      // ];
 
+      this.tests = [];
+      this.dc.detectChanges();
       this.resultsType = 'binary';
    }
 
    setTypeContinuous() {
-      console.log('setTypeContinuous: ');
-      if (this.resultsType !== 'continuous') {
-         console.log('in work');
-         this.resultsType = 'continuous';
+      this.resultsType = 'continuous';
 
-         this.tests = [
-            {
-               results: [1, 17, 2, 13, 9]
-            },
-            {
-               results: [3, 19, 2, 7, 8]
-            }
-         ];
-      }
+      // this.tests = [
+      //    {
+      //       results: [1, 17, 2, 13, 9]
+      //    },
+      //    {
+      //       results: [3, 19, 2, 7, 8]
+      //    }
+      // ];
+
+      this.tests = [];
+      this.dc.detectChanges();
    }
 
    calculateOptimalPair() {

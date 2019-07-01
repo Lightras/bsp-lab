@@ -1,8 +1,89 @@
+$color1: #225378
+$color2: #1695a3
+$color3: #acf0f2
+$color-light: #f3ffe2
+$color-warn: #eb7f00
+
+\:host
+   width: 100%
 div
    display: flex
 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+   -webkit-appearance: none
+   margin: 0
+
 .compare
-   flex-direction: row
+   flex-direction: column
+
+   .strategy-select-box
+      flex-direction: row
+      margin: 10px 15px
+
+      .strategy-label
+         align-items: center
 
    button
       margin-left: 10px
+
+.chart-bounds-wrapper
+   flex-direction: row
+   justify-content: stretch
+
+   .bounds
+      flex-direction: column
+
+      .param-bounds
+         margin: 5px 0
+
+      .label
+         width: 310px
+
+      .param-bounds
+         flex-direction: row
+
+      input
+         width: 40px
+         text-align: center
+         margin: 0 5px
+
+   .chart-select-wrapper
+      width: 600px
+      margin-left: 50px
+      flex-direction: column
+      align-items: flex-end
+
+      ::ng-deep
+         .ng-select
+            width: 350px
+
+
+button
+   border-radius: 5px
+   background: $color1
+   color: white
+   cursor: pointer
+
+   height: 40px
+   width: 130px !important
+   font-size: 16px
+   margin: 5px
+
+   border: 0
+
+   &:disabled
+      background: lightgray
+      color: black
+      cursor: not-allowed
+
+   &:active
+      outline: none
+      box-shadow: 0 3px 4px 0 gray
+
+   &:focus
+      outline: none
+
+   &:hover
+      box-shadow: 0 3px 10px 0 gray
+      background: $color2

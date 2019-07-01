@@ -37,6 +37,17 @@ input[type=number]::-webkit-outer-spin-button
    align-items: center
 
    &.characteristics
+      .row
+         border-bottom: 1px solid
+
+         &:last-child
+            border-bottom: none
+
+      .td:first-child
+         border-right: 1px solid
+         width: 260px
+         justify-content: flex-start
+
       .calculate-chars
          position: absolute
          left: calc(100% + 10px)
@@ -103,8 +114,11 @@ input[type=number]::-webkit-outer-spin-button
 
 .cutoff
    flex-direction: column
-   width: 100px
+   width: 350px
    align-items: flex-start
+
+   //> div
+   //   width:
 
 .continuous-block
    flex-direction: column
@@ -121,9 +135,10 @@ input[type=number]::-webkit-outer-spin-button
    background: $color-light
    border-radius: 5px
    box-shadow: 0 0 5px 0 gray
-   width: 80%
+   width: 1100px
    margin: 10px
    padding: 10px
+   justify-content: flex-start
 
    &.input-card
       align-items: flex-start
@@ -133,11 +148,10 @@ button
    border-radius: 5px
    background: $color1
    color: white
-   box-shadow: 0 3px 10px 0 gray
    cursor: pointer
 
    height: 40px
-   width: 110px !important
+   width: 130px !important
    font-size: 16px
    margin: 5px
 
@@ -156,10 +170,23 @@ button
       outline: none
 
    &:hover
+      box-shadow: 0 3px 10px 0 gray
       background: $color2
+
+
+.high-btn
+   height: 60px
 
 
 ::ng-deep
    .ng-select
       margin-left: 10px
       width: 140px
+
+   .compare
+      .ng-select
+         width: 500px
+
+
+      .ng-dropdown-panel .ng-dropdown-panel-items .ng-option
+         white-space: normal !important
