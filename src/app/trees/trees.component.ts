@@ -103,7 +103,6 @@ export class TreesComponent implements OnInit {
    calcRelation() {
       let params = new Array(10);
       params = this.randomize_params();
-      console.log('params: ', params);
       // @ts-ignore
       const value = this['EU' + this.strategy1](...params) / this['EU' + this.strategy2](...params);
       if (value < 5 && value > -5) {
@@ -116,7 +115,7 @@ export class TreesComponent implements OnInit {
       }
    }
 
-   EU0(Pi, Sei, Spi, Utp, Ufp, Utn, Ufn) {
+   EU0(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
       return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp + (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn;
    }
 
@@ -214,7 +213,26 @@ export class TreesComponent implements OnInit {
          );
    }
 
-   EU11(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+   EU11(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
+      // i
+      return (Pi-Pij)*(1-Sei)*Spj*Utn +
+            Pij*(1-Sei)*(1-Sej)*Ufn +
+            Pij*(1-Sei)*Sej*Utp +
+            (Pi-Pij)*(1-Sei)*(1-Spj)*Ufp +
 
+            (Pi-Pij)*Sei*Spj*Utn +
+            Pij*Sei*(1-Sej)*Ufn +
+            Pij*Sei*Sej*Utp +
+            (Pi-Pij)*Sei*(1-Spj)*Ufp +
+
+            (1-Pj-Pi+Pij)*Spi*Spj*Utn +
+            (Pj-Pij)*Spi*(1-Sej)*Ufn +
+            (Pj-Pij)*Spi*Sej*Utp +
+            (1-Pi-Pj+Pij)*Spi*(1-Sej)*Ufp +
+
+            (1-Pi-Pj+Pij)*(1-Spi)*Spj*Utn +
+            (Pi-Pij)*(1-Spi)*(1-Sej)*Ufn +
+            (Pi-Pij)*(1-Spi)*Sej*Utp +
+            (1-Pi-Pj+Pij)*(1-Spi)*(1-Spj)*Ufp;
    }
 }
