@@ -23,7 +23,7 @@
       </div>
    </div>
 
-   <div class="chart-select-wrapper" *ngIf="compareClicked && strategy1 && strategy2">
+   <div class="chart-select-wrapper" *ngIf="compareClicked">
       <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions"></highcharts-chart>
 
       <ng-select [clearable]="false" bindValue="code"

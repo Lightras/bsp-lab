@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import {log} from 'util';
 
 @Component({
    selector: 'app-trees',
@@ -22,8 +23,9 @@ export class TreesComponent implements OnInit {
    paramsDef: number[][];
    paramsNames: string[];
 
-   strategies = [1,2,3,4,5,6,7,8,9,10];
+   strategies = [0,1,2,3,4,5,6,7,8,9,10,11];
    strategiesNames = [
+      'Одна діагностична технологія',
       'Діагностичні спектри рівні, верифікація негативного результату і-того тесту',
       'Діагностичні спектри рівні, верифікація позитивного результату і-того тесту',
       'Діагностичні спектри різні і не перетинаються, верифікація негативного результату і-того тесту',
@@ -33,7 +35,8 @@ export class TreesComponent implements OnInit {
       'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація негативного результату і-того тесту',
       'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація позитивного результату і-того тесту',
       'Діагностичні спектри частково перетинаються, верифікація негативного результату і-того тесту',
-      'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту'
+      'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту',
+      'Паралельна діагностика (діагностичні спектри частково перетинаються)'
    ];
    // 'Паралельна діагностика, діагностичні спектри частково перетинаються'
 
@@ -84,21 +87,23 @@ export class TreesComponent implements OnInit {
       // this.strategy1 = 1;
       // this.strategy2 = 2;
 
-      this.compare();
+      // this.compare();
    }
 
    compare() {
-      let i = 0;
-      this.data = [];
+      if ((typeof this.strategy1 === 'number') && (typeof this.strategy2 === 'number')) {
+         let i = 0;
+         this.data = [];
 
-      while (i < this.N) {
-         this.data.push(this.calcRelation());
-         i++;
+         while (i < this.N) {
+            this.data.push(this.calcRelation());
+            i++;
+         }
+
+         this.currentParam = 'Pi';
+         this.buildChart(0);
+         this.compareClicked = true;
       }
-
-      this.currentParam = 'Pi';
-      this.buildChart(0);
-      this.compareClicked = true;
    }
 
    buildChart(i) {
@@ -166,6 +171,11 @@ export class TreesComponent implements OnInit {
 
       // todo How do we generate params for 2 different strategies?
       switch (this.strategy1) {
+         case 0: {
+            Pj = params[1];
+            break;
+         }
+
          case 1:
          case 2: {
             Pj = Math.random();
@@ -195,6 +205,13 @@ export class TreesComponent implements OnInit {
          case 10: {
             Pij = Pi * Math.random();
             Pj = Pij + (1 - Pi) * Math.random();
+            break;
+         }
+
+         case 11: {
+            Pij = Pi * Math.random();
+            Pj = Pij + (1 - Pi) * Math.random();
+            break;
          }
 
       }
@@ -202,14 +219,20 @@ export class TreesComponent implements OnInit {
       params[0] = Pi;
       params[1] = Pj;
 
+      // todo This is because I don't know what strategy these params for
+      params.push(Pij ? Pij : Math.random());
+
       return params;
    }
 
    calcRelation() {
       let params = new Array(10);
       params = this.randomize_params();
+
       // @ts-ignore
-      const value = this['EU' + this.strategy1](...params) / this['EU' + this.strategy2](...params);
+      const EUi = this['EU' + this.strategy1](...params);
+      const EUj = this['EU' + this.strategy2](...params);
+      const value = EUi / EUj;
 
       // todo Why does it produce outstanding values? Do we need these bounds?
       if (value < 5 && value > -5) {
