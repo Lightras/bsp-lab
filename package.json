@@ -1,6 +1,6 @@
 {
    "name": "bsplab",
-   "version": "0.0.0",
+   "version": "0.0.1",
    "main": "main.ts",
    "scripts": {
       "ng": "ng",
@@ -10,10 +10,28 @@
       "lint": "ng lint",
       "e2e": "ng e2e",
       "electron": "electron .",
-      "electron-build": "ng build --prod && npm run electron ."
+      "electron-build": "ng build --prod && npm run electron .",
+      "release": "build",
+      "publish-test": "build -p always"
    },
    "build": {
-      "productName": "Фармакоекономічний аналіз"
+      "productName": "Фармакоекономічний аналіз",
+      "win": {
+         "target": [
+            {
+               "target": "nsis",
+               "arch": [
+                  "ia32",
+                  "x64"
+               ]
+            }
+         ],
+         "compression": "store"
+      },
+      "files": [
+         "**/*",
+         "dist/**/*"
+      ]
    },
    "private": true,
    "dependencies": {
@@ -32,7 +50,8 @@
       "ng-select": "^1.0.2",
       "rxjs": "~6.4.0",
       "tslib": "^1.9.0",
-      "zone.js": "~0.9.1"
+      "zone.js": "~0.9.1",
+      "electron-updater": "^4.0.14"
    },
    "devDependencies": {
       "@angular-devkit/build-angular": "~0.800.0",
@@ -45,6 +64,7 @@
       "@types/node": "~8.9.4",
       "codelyzer": "^5.0.0",
       "electron": "^5.0.5",
+      "electron-builder": "^20.44.4",
       "electron-packager": "^14.0.0",
       "jasmine-core": "~3.4.0",
       "jasmine-spec-reporter": "~4.2.1",
