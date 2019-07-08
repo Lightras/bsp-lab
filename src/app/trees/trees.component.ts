@@ -23,6 +23,69 @@ export class TreesComponent implements OnInit {
    paramsDef: number[][];
    paramsNames: string[];
 
+   parameters: [
+      {
+         code: 'Pi',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Pj',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Sei',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Sej',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Spi',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Spj',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Utp',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Ufp',
+         name: 'Діагностичний спектр і-того тесту',
+         min: -1,
+         max: 0
+      },
+      {
+         code: 'Utn',
+         name: 'Діагностичний спектр і-того тесту',
+         min: 0,
+         max: 1
+      },
+      {
+         code: 'Ufn',
+         name: 'Діагностичний спектр і-того тесту',
+         min: -1,
+         max: 0
+      }
+   ];
+
    strategies = [0,1,2,3,4,5,6,7,8,9,10,11];
    strategiesNames = [
       'Одна діагностична технологія',
@@ -38,14 +101,13 @@ export class TreesComponent implements OnInit {
       'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту',
       'Паралельна діагностика (діагностичні спектри частково перетинаються)'
    ];
-   // 'Паралельна діагностика, діагностичні спектри частково перетинаються'
 
    compareList1: any[];
    compareList2: any[];
    labelsList1: any[];
    labelsList2: any[];
-   strategy1: number;
-   strategy2: number;
+   strategy1: Strategy;
+   strategy2: Strategy;
 
    paramsSelectList: any[];
    compareClicked = false;
@@ -71,11 +133,7 @@ export class TreesComponent implements OnInit {
          return {code: p, label: this.paramsNames[i]};
       });
 
-
-
-
       this.paramsBounds = [[0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [-1,0], [0,1], [-1,0]];
-      this.paramsDef    = [[0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [-1,0], [0,1], [-1,0]];
 
       this.compareList1 = this.strategies.map((s, i) => {
          return {number: s, label: this.strategiesNames[i]};
@@ -84,14 +142,12 @@ export class TreesComponent implements OnInit {
          return {number: s, label: this.strategiesNames[i]};
       });
 
-      // this.strategy1 = 1;
-      // this.strategy2 = 2;
-
-      // this.compare();
+      this.strategy1 = {};
+      this.strategy2 = {};
    }
 
    compare() {
-      if ((typeof this.strategy1 === 'number') && (typeof this.strategy2 === 'number')) {
+      if ((typeof this.strategy1.id === 'number') && (typeof this.strategy2.id === 'number')) {
          let i = 0;
          this.data = [];
 
@@ -117,7 +173,7 @@ export class TreesComponent implements OnInit {
          },
 
          title: {
-            text: 'Залежність відношення очікуваних корисностей обраних стратегій від параметрів'
+            text: ''
          },
 
          xAxis: {
@@ -128,7 +184,7 @@ export class TreesComponent implements OnInit {
 
          yAxis: {
             title: {
-               text: 'Відношення очікуваних корисностей першої і другої стратегій'
+               text: 'Відношення витрат першої і другої стратегій'
             }
          },
 
@@ -152,6 +208,7 @@ export class TreesComponent implements OnInit {
    }
 
    selectStrategy(strategyNumber: number, e) {
+      console.log('e: ', e);
       this.compareClicked = false;
    }
 
@@ -170,7 +227,7 @@ export class TreesComponent implements OnInit {
       Pi = params[0];
 
       // todo How do we generate params for 2 different strategies?
-      switch (this.strategy1) {
+      switch (this.strategy1.id) {
          case 0: {
             Pj = params[1];
             break;
@@ -230,8 +287,8 @@ export class TreesComponent implements OnInit {
       params = this.randomize_params();
 
       // @ts-ignore
-      const EUi = this['EU' + this.strategy1](...params);
-      const EUj = this['EU' + this.strategy2](...params);
+      const EUi = this['EU' + this.strategy1.id](...params);
+      const EUj = this['EU' + this.strategy2.id](...params);
       const value = EUi / EUj;
 
       // todo Why does it produce outstanding values? Do we need these bounds?
@@ -366,4 +423,17 @@ export class TreesComponent implements OnInit {
             (Pi-Pij)*(1-Spi)*Sej*Utp +
             (1-Pi-Pj+Pij)*(1-Spi)*(1-Spj)*Ufp;
    }
+}
+
+interface Strategy {
+   id?: number;
+   name?: string;
+   paramsBounds?: number[][];
+}
+
+interface Parameter {
+   code: string;
+   name: string;
+   min: number;
+   max: number;
 }

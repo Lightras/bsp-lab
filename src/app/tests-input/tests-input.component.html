@@ -16,9 +16,9 @@
          <div class="row head">
             <div class="td count">№ зразка</div>
             <div class="td control">Контроль</div>
-            <div class="td test-result" *ngFor="let test of tests; let i = index">Тест {{i + 1}}</div>
+            <div class="td test-result" *ngFor="let test of tests; let i = index">Діагностичний тест № {{i + 1}}</div>
 
-            <div class="td new-test-header" *ngIf="showInputColumn">Тест {{tests.length + 1}}</div>
+            <div class="td test-result new-test-header" *ngIf="showInputColumn">Діагностичний тест № {{tests.length + 1}}</div>
          </div>
 
          <div class="row complete-row" *ngFor="let sample of samples; let i = index">
@@ -29,7 +29,7 @@
                <span *ngIf="resultsType === 'continuous'">{{test.results[i]}}</span>
             </div>
 
-            <div class="td new-test-result" *ngIf="showInputColumn">
+            <div class="td new-test-result test-result" *ngIf="showInputColumn">
                <div class="binary-result-input" *ngIf="resultsType === 'binary'">
                   <button class="positive"
                           [class.active]="newTest[i]"
@@ -85,7 +85,7 @@
             <button class="add-row" *ngIf="!showInputRow && !showInputColumn" (click)="addRow()">Додати зразок</button>
             <button class="add-column" *ngIf="!showInputColumn && !showInputRow" (click)="addTest()">Додати тест</button>
             <button *ngIf="!showInputRow && !showInputColumn && resultsType === 'binary'" (click)="calculateAllTestsCharacteristics()" [disabled]="resultsType === 'continuous' && !cutOff">Обчислити характеристики</button>
-            <button class="high-btn" *ngIf="!showInputRow && !showInputColumn && resultsType === 'continuous'" (click)="calculateOptimalPair()">Знайти оптимальні значення</button>
+            <button class="high-btn" *ngIf="!showInputRow && !showInputColumn && resultsType === 'continuous'" (click)="calculateOptimalPair()">ROC-аналіз</button>
 
             <button class="save" [disabled]="saveDisabled" *ngIf="showInputRow || showInputColumn" (click)="saveInput()">Зберегти</button>
             <button class="cancel" *ngIf="showInputRow || showInputColumn" (click)="cancelInput()">Відміна</button>
@@ -98,7 +98,7 @@
       <div class="table characteristics">
          <div class="row head">
             <div class="td"></div>
-            <div class="td" *ngFor="let test of tests; let i = index">Тест {{i+1}}</div>
+            <div class="td" *ngFor="let test of tests; let i = index">Діагностичний тест № {{i+1}}</div>
          </div>
 
 
@@ -143,11 +143,11 @@
       <div class="calculation-results">
          <div class="curves-plots" *ngFor="let test of tests, let i = index">
             <div class="cutoff">
-               <div>Тест {{i+1}}</div>
-               <div>Оптимальне граничне значення: {{test.optimum.cutoff | number}}</div>
-               <div>Оптимальна чутливість: {{test.optimum.se | number}}</div>
-               <div>Оптимальна специфічність: {{test.optimum.sp | number}}</div>
-               <div>Відстань до точки (0;1): {{test.optimum.distance | number}}</div>
+               <div>Діагностичний тест № {{i+1}}</div>
+               <div>Оптимальне граничне значення діагностичного маркеру: {{test.optimum.cutoff | number}}</div>
+               <div>Чутливість: {{test.optimum.se | number}}</div>
+               <div>Специфічність: {{test.optimum.sp | number}}</div>
+               <div>Найкоротша відстань до точки (0;1): {{test.optimum.distance | number}}</div>
             </div>
 
             <div class="chart-wrapper">

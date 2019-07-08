@@ -1,6 +1,6 @@
 {
    "name": "bsplab",
-   "version": "0.0.3",
+   "version": "0.0.4",
    "main": "main.ts",
    "scripts": {
       "ng": "ng",
@@ -30,7 +30,7 @@
       },
       "files": [
          "**/*",
-         "dist/**/*"
+         "dist/ngBuild/*"
       ]
    },
    "private": true,

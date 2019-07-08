@@ -151,6 +151,10 @@ export class TestsInputComponent implements OnInit {
       } else if (this.currentInputType === 'column') {
          this.saveTest();
       }
+
+      if (this.showCurves) {
+         this.calculateOptimalPair();
+      }
    }
 
    cancelInput() {
@@ -220,6 +224,8 @@ export class TestsInputComponent implements OnInit {
    }
 
    calculateOptimalPair() {
+      this.showCurves = false;
+
       this.min = Math.min(...this.tests.map(t => Math.min(... t.results as number[])));
       this.max = Math.max(...this.tests.map(t => Math.max(... t.results as number[])));
 

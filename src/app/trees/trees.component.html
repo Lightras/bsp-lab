@@ -1,15 +1,15 @@
 <div class="compare">
    <div class="strategy-select-box">
-      <div class="strategy-label">Cтратегія 1</div>
-      <ng-select [clearable]="false" [items]="compareList1" (change)="selectStrategy(1, $event)" [(ngModel)]="strategy1" bindValue="number"></ng-select>
+      <div class="strategy-label">Діагностична стратегія 1</div>
+      <ng-select [clearable]="false" [items]="compareList1" (change)="selectStrategy(1, $event)" [(ngModel)]="strategy1.id" bindValue="number"></ng-select>
    </div>
 
    <div class="strategy-select-box">
-      <div class="strategy-label">Стратегія 2</div>
-      <ng-select [clearable]="false" [items]="compareList2" (change)="selectStrategy(1, $event)" [(ngModel)]="strategy2" bindValue="number"></ng-select>
+      <div class="strategy-label">Діагностична стратегія 2</div>
+      <ng-select [clearable]="false" [items]="compareList2" (change)="selectStrategy(1, $event)" [(ngModel)]="strategy2.id" bindValue="number"></ng-select>
    </div>
 
-   <button (click)="compare()">Compare</button>
+   <button (click)="compare()">Розрахувати</button>
 </div>
 
 <div class="chart-bounds-wrapper">

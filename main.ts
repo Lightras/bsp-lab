@@ -13,7 +13,7 @@ function createWindow() {
       minWidth: 1190,
       title: 'Фармакоекономічний аналіз технологій етіологічної діагностики вірусних інфекцій',
       webPreferences: {
-         devTools: true
+         devTools: false
       }
    });
 

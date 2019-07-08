@@ -23,19 +23,23 @@ export class RocComponent implements OnInit {
          },
 
          title: {
-            text: 'ROC-крива тесту ' + (this.index + 1)
+            text: 'ROC-крива діагностичного тесту № ' + (this.index + 1)
          },
 
          xAxis: {
             title: {
                text: '1 - Специфічність'
-            }
+            },
+            min: 0,
+            max: 1
          },
 
          yAxis: {
             title: {
                text: 'Чутливість'
-            }
+            },
+            min: 0,
+            max: 1
          },
 
          plotOptions: {
