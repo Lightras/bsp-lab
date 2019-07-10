@@ -1,33 +1,34 @@
 <div class="compare">
    <div class="strategy-select-box">
       <div class="strategy-label">Діагностична стратегія 1</div>
-      <ng-select [clearable]="false" [items]="compareList1" (change)="selectStrategy(1, $event)" [(ngModel)]="strategy1.id" bindValue="number"></ng-select>
+      <ng-select [clearable]="false" [items]="compareList1" bindLabel="name" [(ngModel)]="strategy1"></ng-select>
    </div>
 
    <div class="strategy-select-box">
       <div class="strategy-label">Діагностична стратегія 2</div>
-      <ng-select [clearable]="false" [items]="compareList2" (change)="selectStrategy(1, $event)" [(ngModel)]="strategy2.id" bindValue="number"></ng-select>
+      <ng-select [clearable]="false" [items]="compareList2" bindLabel="name" [(ngModel)]="strategy2"></ng-select>
    </div>
 
    <button (click)="compare()">Розрахувати</button>
 </div>
 
 <div class="chart-bounds-wrapper">
-   <div class="bounds">
-      <div class="param-bounds" *ngFor="let bound of paramsBounds, let i = index">
-         <div class="label">{{paramsNames[i]}}</div>
-         <div class="bounds-inputs">
-            <input class="min" type="number" [(ngModel)]="bound[0]">
-            <input class="max" type="number" [(ngModel)]="bound[1]">
-         </div>
-      </div>
-   </div>
+<!--   <div class="bounds">-->
+<!--      <div class="param-bounds" *ngFor="let bound of paramsBounds, let i = index">-->
+<!--         <div class="label">{{paramsNames[i]}}</div>-->
+<!--         <div class="bounds-inputs">-->
+<!--            <input class="min" type="number" [(ngModel)]="bound[0]">-->
+<!--            <input class="max" type="number" [(ngModel)]="bound[1]">-->
+<!--         </div>-->
+<!--      </div>-->
+<!--   </div>-->
 
    <div class="chart-select-wrapper" *ngIf="compareClicked">
       <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions"></highcharts-chart>
 
       <ng-select [clearable]="false" bindValue="code"
-                 [items]="paramsSelectList" (change)="buildChart(paramsOrder.indexOf(currentParam))" [(ngModel)]="currentParam"></ng-select>
+                 [items]="parameters" bindLabel="name"
+                 (change)="buildChart(currentParamCode)" [(ngModel)]="currentParamCode"></ng-select>
    </div>
 </div>
 

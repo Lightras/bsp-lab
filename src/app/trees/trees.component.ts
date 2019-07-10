@@ -15,154 +15,197 @@ export class TreesComponent implements OnInit {
    chartOptions: any;
 
    data: any[];
-   currentInd = 0;
-   paramsOrder: string[];
-   currentParam: string;
+   currentParamCode;
 
-   paramsBounds: number[][];
-   paramsDef: number[][];
-   paramsNames: string[];
+   parameters: Parameter[];
+   paramsValues: ParameterWithValue[];
 
-   parameters: [
-      {
-         code: 'Pi',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Pj',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Sei',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Sej',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Spi',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Spj',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Utp',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Ufp',
-         name: 'Діагностичний спектр і-того тесту',
-         min: -1,
-         max: 0
-      },
-      {
-         code: 'Utn',
-         name: 'Діагностичний спектр і-того тесту',
-         min: 0,
-         max: 1
-      },
-      {
-         code: 'Ufn',
-         name: 'Діагностичний спектр і-того тесту',
-         min: -1,
-         max: 0
-      }
-   ];
+   strategies: Strategy[];
 
-   strategies = [0,1,2,3,4,5,6,7,8,9,10,11];
-   strategiesNames = [
-      'Одна діагностична технологія',
-      'Діагностичні спектри рівні, верифікація негативного результату і-того тесту',
-      'Діагностичні спектри рівні, верифікація позитивного результату і-того тесту',
-      'Діагностичні спектри різні і не перетинаються, верифікація негативного результату і-того тесту',
-      'Діагностичні спектри різні і не перетинаються, верифікація позитивного результату і-того тесту',
-      'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація негативного результату і-того тесту',
-      'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація позитивного результату і-того тесту',
-      'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація негативного результату і-того тесту',
-      'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація позитивного результату і-того тесту',
-      'Діагностичні спектри частково перетинаються, верифікація негативного результату і-того тесту',
-      'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту',
-      'Паралельна діагностика (діагностичні спектри частково перетинаються)'
-   ];
+   compareList1: Strategy[];
+   compareList2: Strategy[];
 
-   compareList1: any[];
-   compareList2: any[];
-   labelsList1: any[];
-   labelsList2: any[];
    strategy1: Strategy;
    strategy2: Strategy;
 
-   paramsSelectList: any[];
    compareClicked = false;
 
-   N = 2000;
+   N = 500;
+   L = 500;
+   W = 10;
 
    ngOnInit() {
-      this.paramsOrder = ['Pi', 'Pj', 'Sei', 'Sej', 'Spi', 'Spj', 'Utp', 'Ufp', 'Utn', 'Ufn'];
-      this.paramsNames = [
-         'Діагностичний спектр і-того тесту',
-         'Діагностичний спектр j-того тесту',
-         'Чутливість і-того тесту',
-         'Чутливість j-того тесту',
-         'Специфічність і-того тесту',
-         'Специфічність j-того тесту',
-         'Корисність дійснопозитивного результату',
-         'Корисність хибнопозитивного результату',
-         'Корисність дійснонегативного результату',
-         'Корисність хибнонегативного результату'
+      this.parameters = [
+         {
+            code: 'Pi',
+            name: 'Діагностичний спектр і-того тесту',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Pj',
+            name: 'Діагностичний спектр і-того тесту',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Sei',
+            name: 'Діагностичний спектр і-того тесту',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Sej',
+            name: 'Діагностичний спектр і-того тесту',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Spi',
+            name: 'Діагностичний спектр і-того тесту',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Spj',
+            name: 'Діагностичний спектр і-того тесту',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Utp',
+            name: 'Корисність дійснопозитивного результату',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Ufp',
+            name: 'Корисність хибнопозитивного результату',
+            minAllowed: -1,
+            maxAllowed: 0,
+         },
+         {
+            code: 'Utn',
+            name: 'Корисність дійснонегативного результату',
+            minAllowed: 0,
+            maxAllowed: 1,
+         },
+         {
+            code: 'Ufn',
+            name: 'Корисність хибнонегативного результату',
+            minAllowed: -1,
+            maxAllowed: 0,
+         }
       ];
 
-      this.paramsSelectList = this.paramsOrder.map((p, i) => {
-         return {code: p, label: this.paramsNames[i]};
+      // @ts-ignore
+      this.strategies = [
+         {
+            id: 0,
+            name: 'Одна діагностична технологія'
+         },
+         {
+            id: 1,
+            name: 'Діагностичні спектри рівні, верифікація негативного результату і-того тесту'
+         },
+         {
+            id: 2,
+            name: 'Діагностичні спектри рівні, верифікація позитивного результату і-того тесту'
+         },
+         {
+            id: 3,
+            name: 'Діагностичні спектри різні і не перетинаються, верифікація негативного результату і-того тесту'
+         },
+         {
+            id: 4,
+            name: 'Діагностичні спектри різні і не перетинаються, верифікація позитивного результату і-того тесту'
+         },
+         {
+            id: 5,
+            name: 'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація негативного результату і-того тесту'
+         },
+         {
+            id: 6,
+            name: 'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація позитивного результату і-того тесту'
+         },
+         {
+            id: 7,
+            name: 'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація негативного результату і-того тесту'
+         },
+         {
+            id: 8,
+            name: 'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація позитивного результату і-того тесту'
+         },
+         {
+            id: 9,
+            name: 'Діагностичні спектри частково перетинаються, верифікація негативного результату і-того тесту'
+         },
+         {
+            id: 10,
+            name: 'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту'
+         },
+         {
+            id: 11,
+            name: 'Паралельна діагностика (діагностичні спектри частково перетинаються)'
+         },
+
+      ];
+
+      this.strategies.forEach(s => {
+         s.paramsBounds = this.parameters.map((p: ParameterWithBounds) => {
+            return {
+               ...p,
+               minBound: p.minAllowed,
+               maxBound: p.maxAllowed
+            };
+         });
       });
 
-      this.paramsBounds = [[0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [0,1], [-1,0], [0,1], [-1,0]];
-
-      this.compareList1 = this.strategies.map((s, i) => {
-         return {number: s, label: this.strategiesNames[i]};
-      });
-      this.compareList2 = this.strategies.map((s, i) => {
-         return {number: s, label: this.strategiesNames[i]};
-      });
+      this.compareList1 = this.strategies;
+      this.compareList2 = this.strategies;
 
       this.strategy1 = {};
       this.strategy2 = {};
    }
 
    compare() {
-      if ((typeof this.strategy1.id === 'number') && (typeof this.strategy2.id === 'number')) {
-         let i = 0;
-         this.data = [];
+      this.currentParamCode = 'Pi';
 
-         while (i < this.N) {
-            this.data.push(this.calcRelation());
-            i++;
-         }
+      this.buildChart(this.currentParamCode);
 
-         this.currentParam = 'Pi';
-         this.buildChart(0);
-         this.compareClicked = true;
-      }
+      this.compareClicked = true;
    }
 
-   buildChart(i) {
+   buildChart(currentParamCode) {
+      const parameter: Parameter = this.parameters.find(p => p.code === currentParamCode);
+      let data = [];
+      let xLevels = [];
+      let x = [];
+      let i = 0;
+      const step = (parameter.maxAllowed - parameter.minAllowed) / this.L;
+      let lastValue = parameter.minAllowed;
+
+      while (i < this.L) {
+         xLevels.push(lastValue);
+         lastValue += step;
+         i++;
+      }
+      
+      xLevels.forEach(point => {
+         let j = 0;
+         while (j < this.W) {
+            x.push(point);
+            j++;
+         }
+      });
+
+      data = x.map(value => {
+         return [
+            value,
+            this.calcRelation(parameter, value)
+         ];
+      });
+
       this.chartOptions = {
          credits: {
             enabled: false
@@ -202,7 +245,7 @@ export class TreesComponent implements OnInit {
 
          series: [{
             name: '',
-            data: this.data.map(p => [p.params[i], p.value])
+            data
          }]
       };
    }
@@ -212,94 +255,203 @@ export class TreesComponent implements OnInit {
       this.compareClicked = false;
    }
 
-   randomize_params(): number[] {
+   boundedRandom(min, max) {
+      return min + (max - min) * Math.random();
+   }
+
+   randomize_params(strategy: Strategy, currentParamCode: string, currentParamValue: number): number[] {
       let Pi: number;
       let Pj: number;
       let Pij: number;
+      let isValueCorrect: boolean;
+
 
       // @ts-ignore
-      const params = [];
+      const paramsValues = [];
 
-      this.paramsBounds.forEach((bound, i) => {
-         params[i] = bound[0] + Math.random() * (bound[1] - bound[0]);
+      strategy.paramsBounds.forEach(p => {
+         if (p.code !== currentParamCode) {
+            paramsValues.push(this.boundedRandom(p.minBound, p.maxBound));
+         } else {
+            paramsValues.push(currentParamValue);
+         }
       });
 
-      Pi = params[0];
+      Pi = paramsValues[0];
+      Pj = paramsValues[0];
 
-      // todo How do we generate params for 2 different strategies?
-      switch (this.strategy1.id) {
-         case 0: {
-            Pj = params[1];
-            break;
+      if (currentParamCode === 'Pi') {
+         switch (strategy.id) {
+            case 0:
+            case 1:
+            case 2: {
+               break;
+            }
+
+            case 3:
+            case 4: {
+               while (!isValueCorrect) {
+                  Pj = (1 - Pi) * Math.random();
+
+                  if (Pj > strategy.paramsBounds[1].minBound &&
+                     Pj < strategy.paramsBounds[1].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+               break;
+            }
+
+            case 5:
+            case 6: {
+               while (!isValueCorrect) {
+                  Pj = Pi * Math.random();
+
+                  if (Pj > strategy.paramsBounds[1].minBound &&
+                     Pj < strategy.paramsBounds[1].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+
+
+               Pj = Pi * Math.random();
+               break;
+            }
+
+            case 7:
+            case 8: {
+               while (!isValueCorrect) {
+                  Pi = Pj * Math.random();
+
+                  if (Pi > strategy.paramsBounds[0].minBound &&
+                     Pi < strategy.paramsBounds[0].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+               break;
+            }
+
+            case 9:
+            case 10:
+            case 11: {
+               Pij = Pi * Math.random();
+
+               while (!isValueCorrect) {
+                  Pj = Pij + (1 - Pi) * Math.random();
+
+                  if (Pi > strategy.paramsBounds[0].minBound &&
+                     Pi < strategy.paramsBounds[0].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+               break;
+            }
          }
 
-         case 1:
-         case 2: {
-            Pj = Math.random();
-            break;
-         }
+      } else if (currentParamCode === 'Pj') {
 
-         case 3:
-         case 4: {
-            Pj = (1 - Pi) * Math.random();
-            break;
-         }
+      } else {
+         isValueCorrect = false;
 
-         case 5:
-         case 6: {
-            Pj = Pi * Math.random();
-            break;
-         }
+         switch (strategy.id) {
+            case 0:
+            case 1:
+            case 2: {
+               break;
+            }
 
-         case 7:
-         case 8: {
-            Pj = Math.random();
-            Pi = Pj * Math.random();
-            break;
-         }
+            case 3:
+            case 4: {
+               while (!isValueCorrect) {
+                  Pj = (1 - Pi) * Math.random();
 
-         case 9:
-         case 10: {
-            Pij = Pi * Math.random();
-            Pj = Pij + (1 - Pi) * Math.random();
-            break;
-         }
+                  if (Pj > strategy.paramsBounds[1].minBound &&
+                      Pj < strategy.paramsBounds[1].maxBound) {
 
-         case 11: {
-            Pij = Pi * Math.random();
-            Pj = Pij + (1 - Pi) * Math.random();
-            break;
-         }
+                     isValueCorrect = true;
+                  }
+               }
+               break;
+            }
 
+            case 5:
+            case 6: {
+               while (!isValueCorrect) {
+                  Pj = Pi * Math.random();
+
+                  if (Pj > strategy.paramsBounds[1].minBound &&
+                     Pj < strategy.paramsBounds[1].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+
+
+               Pj = Pi * Math.random();
+               break;
+            }
+
+            case 7:
+            case 8: {
+               while (!isValueCorrect) {
+                  Pi = Pj * Math.random();
+
+                  if (Pi > strategy.paramsBounds[0].minBound &&
+                     Pi < strategy.paramsBounds[0].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+               break;
+            }
+
+            case 9:
+            case 10:
+            case 11: {
+               Pij = Pi * Math.random();
+
+               while (!isValueCorrect) {
+                  Pj = Pij + (1 - Pi) * Math.random();
+
+                  if (Pi > strategy.paramsBounds[0].minBound &&
+                     Pi < strategy.paramsBounds[0].maxBound) {
+
+                     isValueCorrect = true;
+                  }
+               }
+               break;
+            }
+         }
       }
 
-      params[0] = Pi;
-      params[1] = Pj;
+      if (Pij) {
+         paramsValues.push(Pij);
+      }
 
-      // todo This is because I don't know what strategy these params for
-      params.push(Pij ? Pij : Math.random());
+      paramsValues[0] = Pi;
+      paramsValues[1] = Pj;
 
-      return params;
+      return paramsValues;
    }
 
-   calcRelation() {
-      let params = new Array(10);
-      params = this.randomize_params();
+   calcRelation(parameter: Parameter, value: number) {
+      const params1 = this.randomize_params(this.strategy1, parameter.code, value);
+      const params2 = this.randomize_params(this.strategy2, parameter.code, value);
 
       // @ts-ignore
-      const EUi = this['EU' + this.strategy1.id](...params);
-      const EUj = this['EU' + this.strategy2.id](...params);
-      const value = EUi / EUj;
+      const EUi = this['EU' + this.strategy1.id](...params1);
+      const EUj = this['EU' + this.strategy2.id](...params2);
+      const relation = EUi / EUj;
 
       // todo Why does it produce outstanding values? Do we need these bounds?
-      if (value < 5 && value > -5) {
-      // if (true) {
-         return {
-            params,
-            value
-         };
+      // if (value < 5 && value > -5) {
+      if (true) {
+         return relation;
       } else {
-         return this.calcRelation();
+         return this.calcRelation(parameter, value);
       }
    }
 
@@ -428,12 +580,21 @@ export class TreesComponent implements OnInit {
 interface Strategy {
    id?: number;
    name?: string;
-   paramsBounds?: number[][];
+   paramsBounds?: ParameterWithBounds[];
+}
+
+interface ParameterWithValue extends ParameterWithBounds {
+   value: number;
+}
+
+interface ParameterWithBounds extends Parameter {
+   minBound: number;
+   maxBound: number;
 }
 
 interface Parameter {
    code: string;
    name: string;
-   min: number;
-   max: number;
+   minAllowed: number;
+   maxAllowed: number;
 }
