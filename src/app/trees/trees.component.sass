@@ -18,7 +18,9 @@ input[type=number]::-webkit-outer-spin-button
    flex-direction: column
 
    .strategy-select-box
-      flex-direction: row
+      flex-direction: column
+      width: 100%
+      align-items: center
       margin: 10px 15px
 
       .strategy-label
@@ -28,25 +30,31 @@ input[type=number]::-webkit-outer-spin-button
       margin-left: 10px
 
 .chart-bounds-wrapper
-   flex-direction: row
-   justify-content: stretch
+   flex-direction: column
+   align-items: center
 
-   .bounds
-      flex-direction: column
+   .bounds-wrapper
+      flex-direction: row
+      width: 100%
+      justify-content: space-around
 
-      .param-bounds
-         margin: 5px 0
+      .bounds
+         flex-direction: column
+         align-items: center
 
-      .label
-         width: 310px
+         .param-bounds
+            margin: 5px 0
 
-      .param-bounds
-         flex-direction: row
+         .label
+            width: 310px
 
-      input
-         width: 40px
-         text-align: center
-         margin: 0 5px
+         .param-bounds
+            flex-direction: row
+
+         input
+            width: 40px
+            text-align: center
+            margin: 0 5px
 
    .chart-select-wrapper
       width: 600px

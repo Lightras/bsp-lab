@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
-import {log} from 'util';
 
 @Component({
    selector: 'app-trees',
@@ -14,12 +13,9 @@ export class TreesComponent implements OnInit {
    highcharts = Highcharts;
    chartOptions: any;
 
-   data: any[];
    currentParamCode;
 
    parameters: Parameter[];
-   paramsValues: ParameterWithValue[];
-
    strategies: Strategy[];
 
    compareList1: Strategy[];
@@ -30,8 +26,10 @@ export class TreesComponent implements OnInit {
 
    compareClicked = false;
 
+   callCount = 0;
+
    N = 500;
-   L = 500;
+   L = 1000;
    W = 10;
 
    ngOnInit() {
@@ -177,6 +175,9 @@ export class TreesComponent implements OnInit {
    }
 
    buildChart(currentParamCode) {
+      console.log(this.strategy1.id);
+      console.log(this.strategy2.id);
+
       const parameter: Parameter = this.parameters.find(p => p.code === currentParamCode);
       let data = [];
       let xLevels = [];
@@ -185,9 +186,9 @@ export class TreesComponent implements OnInit {
       const step = (parameter.maxAllowed - parameter.minAllowed) / this.L;
       let lastValue = parameter.minAllowed;
 
-      while (i < this.L) {
-         xLevels.push(lastValue);
+      while (i < this.L - 1) {
          lastValue += step;
+         xLevels.push(lastValue);
          i++;
       }
       
@@ -200,6 +201,8 @@ export class TreesComponent implements OnInit {
       });
 
       data = x.map(value => {
+         this.callCount = 0;
+
          return [
             value,
             this.calcRelation(parameter, value)
@@ -212,7 +215,8 @@ export class TreesComponent implements OnInit {
          },
 
          chart: {
-            type: 'scatter'
+            type: 'scatter',
+            zoom: 'xy'
          },
 
          title: {
@@ -250,8 +254,10 @@ export class TreesComponent implements OnInit {
       };
    }
 
-   selectStrategy(strategyNumber: number, e) {
-      console.log('e: ', e);
+   selectStrategy(strategyNumber: number, strategy: Strategy) {
+      console.log('strategyNumber: ', strategyNumber);
+      console.log('strategy: ', strategy);
+      this['strategy' + strategyNumber] = strategy;
       this.compareClicked = false;
    }
 
@@ -259,11 +265,18 @@ export class TreesComponent implements OnInit {
       return min + (max - min) * Math.random();
    }
 
+   logError(e) {
+      console.error('error: ', e);
+   }
+
    randomize_params(strategy: Strategy, currentParamCode: string, currentParamValue: number): number[] {
       let Pi: number;
       let Pj: number;
       let Pij: number;
       let isValueCorrect: boolean;
+      let minBound: number;
+      let maxBound: number;
+      let iterCount: number;
 
 
       // @ts-ignore
@@ -278,9 +291,12 @@ export class TreesComponent implements OnInit {
       });
 
       Pi = paramsValues[0];
-      Pj = paramsValues[0];
+      Pj = paramsValues[1];
 
       if (currentParamCode === 'Pi') {
+         minBound = strategy.paramsBounds[1].minBound;
+         maxBound = strategy.paramsBounds[1].maxBound;
+
          switch (strategy.id) {
             case 0:
             case 1:
@@ -290,61 +306,58 @@ export class TreesComponent implements OnInit {
 
             case 3:
             case 4: {
-               while (!isValueCorrect) {
-                  Pj = (1 - Pi) * Math.random();
-
-                  if (Pj > strategy.paramsBounds[1].minBound &&
-                     Pj < strategy.paramsBounds[1].maxBound) {
-
-                     isValueCorrect = true;
-                  }
+               if ((1 - Pi) < minBound) {
+                  console.log('strategy.paramsBounds: ', strategy.paramsBounds);
+                  this.logError(`bounds logical error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
+               } else if ((1-Pi) < maxBound) {
+                  maxBound = (1-Pi);
                }
+
+               Pj = this.boundedRandom(minBound, maxBound);
                break;
             }
 
             case 5:
             case 6: {
-               while (!isValueCorrect) {
-                  Pj = Pi * Math.random();
-
-                  if (Pj > strategy.paramsBounds[1].minBound &&
-                     Pj < strategy.paramsBounds[1].maxBound) {
-
-                     isValueCorrect = true;
-                  }
+               if (Pi < minBound) {
+                  this.logError(`bounds logical error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
+               } else if (Pi < maxBound) {
+                  maxBound = Pi;
                }
 
-
-               Pj = Pi * Math.random();
+               Pj = this.boundedRandom(minBound, maxBound);
                break;
             }
 
             case 7:
             case 8: {
-               while (!isValueCorrect) {
-                  Pi = Pj * Math.random();
-
-                  if (Pi > strategy.paramsBounds[0].minBound &&
-                     Pi < strategy.paramsBounds[0].maxBound) {
-
-                     isValueCorrect = true;
-                  }
+               if (Pj < minBound) {
+                  this.logError(`bounds logical error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
+               } else if (Pj < maxBound) {
+                  maxBound = Pj;
                }
+
+               Pi = this.boundedRandom(minBound, maxBound);
                break;
             }
 
             case 9:
             case 10:
             case 11: {
+               iterCount = 0;
                Pij = Pi * Math.random();
 
                while (!isValueCorrect) {
                   Pj = Pij + (1 - Pi) * Math.random();
 
-                  if (Pi > strategy.paramsBounds[0].minBound &&
-                     Pi < strategy.paramsBounds[0].maxBound) {
+                  if (Pj > strategy.paramsBounds[1].minBound &&
+                     Pj < strategy.paramsBounds[1].maxBound) {
 
                      isValueCorrect = true;
+                  }
+                  iterCount++;
+                  if (iterCount > 500) {
+                     this.logError(`value generation error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
                   }
                }
                break;
@@ -447,10 +460,16 @@ export class TreesComponent implements OnInit {
       const relation = EUi / EUj;
 
       // todo Why does it produce outstanding values? Do we need these bounds?
-      // if (value < 5 && value > -5) {
-      if (true) {
+      if (relation < 10 && relation > -10) {
+      // if (true) {
          return relation;
       } else {
+         this.callCount++;
+         
+         if (this.callCount > 100) {
+            console.log('params2: ', params2);
+         }
+
          return this.calcRelation(parameter, value);
       }
    }
@@ -474,30 +493,45 @@ export class TreesComponent implements OnInit {
    }
 
    EU3(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+      if (Pj > 1-Pi) {
+         this.logError(3);
+      }
       // ni v n i
       return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp + (1-Pi)*Spi*(Pj/(1-Pi)*Sej*Utp + (1-Pi-Pj)/(1-Pi)*(1-Spj)*Ufp + (1-Pi-Pj)/(1-Pi)*Spj*Utn +
          Pj/(1-Pi)*(1-Sej)*Ufn) + Pi*(1-Sei)*(Spj*Utn + (1-Spj)*Ufp);
    }
 
    EU4(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+      if (Pj > 1-Pi) {
+         this.logError(4);
+      }
       // ni v p i
       return (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn + (1-Pi)*(1-Spi)*(Pj/(1-Pi)*Sej*Utp + (1-Pi-Pj)/(1-Pi)*(1-Spj)*Ufp +
          (1-Pi-Pj)/(1-Pi)*Spj*Utn + Pj/(1-Pi)*(1-Sej)*Ufn) + Pi*Sei*(Sej*Utn + (1-Sej)*Ufp);
    }
 
    EU5(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+      if (Pj > Pi) {
+         this.logError(5);
+      }
       // j<i v n i
       return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp + (1-Pi)*Spi*(Spj*Utn + (1-Spj)*Ufn) + Pi*(1-Sei)*((Pj/Pi)*Sej)*Utp +
          (Pi-Pj)/Pi*(1-Spj)*Ufp + (Pi-Pj)/Pi*Spj*Utn + (Pj/Pi)*(1-Sej)*Ufn;
    }
 
    EU6(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+      if (Pj > Pi) {
+         this.logError(6);
+      }
       // j<i v p i
       return (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn + (1-Pi)*(1-Spi)*(Spj*Utn + (1-Spj)*Ufn) +
          Pi*Sei*((Pj/Pi)*Sej*Utp + (Pi-Pj)*Pi*(1-Spj)*Ufp + (Pi-Pj)/Pi*Spj*Utn + (Pj/Pi)*(1-Sej)*Ufn);
    }
 
    EU7(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+      if (Pi > Pj) {
+         this.logError(7);
+      }
       // i<j v n i
       return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp +
          (1-Pi)*Spi*((Pj-Pi)/(1-Pi)*Sej)*Utp + (1-Pj)/(1-Pi)*(1-Spj)*Ufp + (1-Pj)/(1-Pi)*Spj*Utn + (Pj-Pi)/(1-Pi)*(1-Sej)*Ufn +
@@ -505,6 +539,9 @@ export class TreesComponent implements OnInit {
    }
 
    EU8(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
+      if (Pi > Pj) {
+         this.logError(8);
+      }
       // i<j v p i
       return (1-Pi)*Spi*Utn +
          Pi*(1-Sei)*Ufn +
@@ -520,6 +557,9 @@ export class TreesComponent implements OnInit {
    }
 
    EU9(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
+      if (Pij > Pi || Pj > (Pij + 1 - Pi)) {
+         this.logError(9)
+      }
       // i v n i
       return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp +
          (1-Pi)*Spi*(
@@ -537,6 +577,9 @@ export class TreesComponent implements OnInit {
    }
 
    EU10(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
+      if (Pij > Pi || Pj > (Pij + 1 - Pi)) {
+         this.logError(10)
+      }
       // i v p i
       return (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn +
          (1-Pi)*(1-Spi)*(
@@ -554,6 +597,9 @@ export class TreesComponent implements OnInit {
    }
 
    EU11(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
+      if (Pij > Pi || Pj > (Pij + 1 - Pi)) {
+         this.logError(11)
+      }
       // i
       return (Pi-Pij)*(1-Sei)*Spj*Utn +
             Pij*(1-Sei)*(1-Sej)*Ufn +
