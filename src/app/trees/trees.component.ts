@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import deepcopy from "ts-deepcopy";
 
 @Component({
    selector: 'app-trees',
@@ -26,11 +27,17 @@ export class TreesComponent implements OnInit {
 
    compareClicked = false;
 
+   EUValues1: any;
+   EUValues2: any;
+
+   chartOptions1: any;
+   chartOptions2: any;
+
    callCount = 0;
 
    N = 500;
-   L = 1000;
-   W = 10;
+   L = 500;
+   W = 5;
 
    ngOnInit() {
       this.parameters = [
@@ -42,31 +49,31 @@ export class TreesComponent implements OnInit {
          },
          {
             code: 'Pj',
-            name: 'Діагностичний спектр і-того тесту',
+            name: 'Діагностичний спектр j-того тесту',
             minAllowed: 0,
             maxAllowed: 1,
          },
          {
             code: 'Sei',
-            name: 'Діагностичний спектр і-того тесту',
+            name: 'Чутливість і-того тесту',
             minAllowed: 0,
             maxAllowed: 1,
          },
          {
             code: 'Sej',
-            name: 'Діагностичний спектр і-того тесту',
+            name: 'Чутливість j-того тесту',
             minAllowed: 0,
             maxAllowed: 1,
          },
          {
             code: 'Spi',
-            name: 'Діагностичний спектр і-того тесту',
+            name: 'Специфічність і-того тесту',
             minAllowed: 0,
             maxAllowed: 1,
          },
          {
             code: 'Spj',
-            name: 'Діагностичний спектр і-того тесту',
+            name: 'Специфічність j-того тесту',
             minAllowed: 0,
             maxAllowed: 1,
          },
@@ -159,8 +166,8 @@ export class TreesComponent implements OnInit {
          });
       });
 
-      this.compareList1 = this.strategies;
-      this.compareList2 = this.strategies;
+      this.compareList1 = deepcopy(this.strategies);
+      this.compareList2 = deepcopy(this.strategies);
 
       this.strategy1 = {};
       this.strategy2 = {};
@@ -174,12 +181,14 @@ export class TreesComponent implements OnInit {
       this.compareClicked = true;
    }
 
-   buildChart(currentParamCode) {
+   buildChart(currentParamCode, isSingleFunction?) {
       console.log(this.strategy1.id);
       console.log(this.strategy2.id);
 
       const parameter: Parameter = this.parameters.find(p => p.code === currentParamCode);
       let data = [];
+      let data1 = [];
+      let data2 = [];
       let xLevels = [];
       let x = [];
       let i = 0;
@@ -200,23 +209,32 @@ export class TreesComponent implements OnInit {
          }
       });
 
-      data = x.map(value => {
+      x.forEach(value => {
          this.callCount = 0;
 
-         return [
-            value,
-            this.calcRelation(parameter, value)
-         ];
+         const relationValues = this.calcRelation(parameter, value);
+
+         data.push([value, relationValues[0]]);
+         data1.push([value, relationValues[1]]);
+         data2.push([value, relationValues[2]]);
       });
 
-      this.chartOptions = {
+      // console.log();
+
+      this.chartOptions = this.buildChartOptions(data);
+      this.chartOptions1 = this.buildChartOptions(data1);
+      this.chartOptions2 = this.buildChartOptions(data2);
+   }
+
+   buildChartOptions(data) {
+      return {
          credits: {
             enabled: false
          },
 
          chart: {
             type: 'scatter',
-            zoom: 'xy'
+               zoom: 'xy'
          },
 
          title: {
@@ -367,7 +385,8 @@ export class TreesComponent implements OnInit {
       } else if (currentParamCode === 'Pj') {
 
       } else {
-         isValueCorrect = false;
+         minBound = strategy.paramsBounds[1].minBound;
+         maxBound = strategy.paramsBounds[1].maxBound;
 
          switch (strategy.id) {
             case 0:
@@ -378,61 +397,58 @@ export class TreesComponent implements OnInit {
 
             case 3:
             case 4: {
-               while (!isValueCorrect) {
-                  Pj = (1 - Pi) * Math.random();
-
-                  if (Pj > strategy.paramsBounds[1].minBound &&
-                      Pj < strategy.paramsBounds[1].maxBound) {
-
-                     isValueCorrect = true;
-                  }
+               if ((1 - Pi) < minBound) {
+                  console.log('strategy.paramsBounds: ', strategy.paramsBounds);
+                  this.logError(`bounds logical error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
+               } else if ((1-Pi) < maxBound) {
+                  maxBound = (1-Pi);
                }
+
+               Pj = this.boundedRandom(minBound, maxBound);
                break;
             }
 
             case 5:
             case 6: {
-               while (!isValueCorrect) {
-                  Pj = Pi * Math.random();
-
-                  if (Pj > strategy.paramsBounds[1].minBound &&
-                     Pj < strategy.paramsBounds[1].maxBound) {
-
-                     isValueCorrect = true;
-                  }
+               if (Pi < minBound) {
+                  this.logError(`bounds logical error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
+               } else if (Pi < maxBound) {
+                  maxBound = Pi;
                }
 
-
-               Pj = Pi * Math.random();
+               Pj = this.boundedRandom(minBound, maxBound);
                break;
             }
 
             case 7:
             case 8: {
-               while (!isValueCorrect) {
-                  Pi = Pj * Math.random();
-
-                  if (Pi > strategy.paramsBounds[0].minBound &&
-                     Pi < strategy.paramsBounds[0].maxBound) {
-
-                     isValueCorrect = true;
-                  }
+               if (Pj < minBound) {
+                  this.logError(`bounds logical error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
+               } else if (Pj < maxBound) {
+                  maxBound = Pj;
                }
+
+               Pi = this.boundedRandom(minBound, maxBound);
                break;
             }
 
             case 9:
             case 10:
             case 11: {
+               iterCount = 0;
                Pij = Pi * Math.random();
 
                while (!isValueCorrect) {
                   Pj = Pij + (1 - Pi) * Math.random();
 
-                  if (Pi > strategy.paramsBounds[0].minBound &&
-                     Pi < strategy.paramsBounds[0].maxBound) {
+                  if (Pj > strategy.paramsBounds[1].minBound &&
+                     Pj < strategy.paramsBounds[1].maxBound) {
 
                      isValueCorrect = true;
+                  }
+                  iterCount++;
+                  if (iterCount > 500) {
+                     this.logError(`value generation error:\nstrategy: ${strategy.id}\nparameter: ${currentParamCode}`);
                   }
                }
                break;
@@ -462,7 +478,7 @@ export class TreesComponent implements OnInit {
       // todo Why does it produce outstanding values? Do we need these bounds?
       if (relation < 10 && relation > -10) {
       // if (true) {
-         return relation;
+         return [relation, EUi, EUj];
       } else {
          this.callCount++;
          
