@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
-import deepcopy from "ts-deepcopy";
+import deepcopy from 'ts-deepcopy';
 
 @Component({
    selector: 'app-trees',
@@ -181,10 +181,7 @@ export class TreesComponent implements OnInit {
       this.compareClicked = true;
    }
 
-   buildChart(currentParamCode, isSingleFunction?) {
-      console.log(this.strategy1.id);
-      console.log(this.strategy2.id);
-
+   buildChart(currentParamCode) {
       const parameter: Parameter = this.parameters.find(p => p.code === currentParamCode);
       let data = [];
       let data1 = [];
@@ -224,6 +221,9 @@ export class TreesComponent implements OnInit {
       this.chartOptions = this.buildChartOptions(data);
       this.chartOptions1 = this.buildChartOptions(data1);
       this.chartOptions2 = this.buildChartOptions(data2);
+
+      this.chartOptions1.yAxis.title.text = 'Очікувана корисність першої стратегії';
+      this.chartOptions2.yAxis.title.text = 'Очікувана корисність другої стратегії';
    }
 
    buildChartOptions(data) {
@@ -273,8 +273,6 @@ export class TreesComponent implements OnInit {
    }
 
    selectStrategy(strategyNumber: number, strategy: Strategy) {
-      console.log('strategyNumber: ', strategyNumber);
-      console.log('strategy: ', strategy);
       this['strategy' + strategyNumber] = strategy;
       this.compareClicked = false;
    }
