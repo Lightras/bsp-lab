@@ -3,7 +3,7 @@ import * as Highcharts from 'highcharts';
 import addMore from 'highcharts/highcharts-more';
 import deepcopy from 'ts-deepcopy';
 
-addMore(Highcharts)
+addMore(Highcharts);
 
 @Component({
    selector: 'app-trees',
@@ -50,7 +50,8 @@ export class TreesComponent implements OnInit {
 
       chart: {
          type: 'columnrange',
-         inverted: true
+         inverted: true,
+         width: 450
       },
 
       title: {
@@ -91,7 +92,23 @@ export class TreesComponent implements OnInit {
 
    };
 
+   periodsChartOptions1: any;
+   periodsChartOptions2: any;
+
    ngOnInit() {
+      this.periodsChartOptions1 = deepcopy(this.periodsChartOptions);
+      this.periodsChartOptions2 = deepcopy(this.periodsChartOptions);
+
+      this.periodsChartOptions1.yAxis.min = -1;
+      this.periodsChartOptions1.yAxis.max = 1;
+      this.periodsChartOptions1.yAxis.title.text = 'Очікувана корисність першої стратегії';
+
+      this.periodsChartOptions2.yAxis.min = -1;
+      this.periodsChartOptions2.yAxis.max = 1;
+      this.periodsChartOptions2.yAxis.title.text = 'Очікувана корисність другої стратегії';
+
+      this.periodsChartOptions.yAxis.title.text = 'Відношення очікуваних корисностей першої і другої стратегій';
+
       this.parameters = [
          {
             code: 'Pi',
@@ -713,7 +730,13 @@ export class TreesComponent implements OnInit {
       this.isCompareMode = true;
 
       this.periodsChartOptions.xAxis.categories = this.periods.map(p => p.name);
-      this.periodsChartOptions.series[0].data = this.periods.map(p => p.periodData.EU1);
+      this.periodsChartOptions.series[0].data = this.periods.map(p => p.periodData.EUr);
+
+      this.periodsChartOptions1.xAxis.categories = this.periods.map(p => p.name);
+      this.periodsChartOptions1.series[0].data = this.periods.map(p => p.periodData.EU1);
+
+      this.periodsChartOptions2.xAxis.categories = this.periods.map(p => p.name);
+      this.periodsChartOptions2.series[0].data = this.periods.map(p => p.periodData.EU2);
 
       this.isShowPeriodChart = true;
    }
@@ -731,7 +754,7 @@ export class TreesComponent implements OnInit {
          strategy2: this.strategies[1]
       };
 
-      this.periods = [this.currentPeriod];
+      this.periods = [this.currentPeriod, this.currentPeriod, this.currentPeriod, this.currentPeriod, this.currentPeriod];
 
       this.compare();
       this.comparePeriods();

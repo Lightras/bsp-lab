@@ -65,12 +65,16 @@
 
    <button *ngIf="isCompareMode && !isShowPeriodChart" (click)="compare()">Розрахувати</button>
 
-   <div class="periods-chart-wrapper" *ngIf="isShowPeriodChart">
-      <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions1"></highcharts-chart>
-
-      <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions2"></highcharts-chart>
-
-      <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions"></highcharts-chart>
+   <div class="periods-charts-wrapper" *ngIf="isShowPeriodChart">
+      <div class="period-chart-wrapper">
+         <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions1"></highcharts-chart>
+      </div>
+      <div class="period-chart-wrapper">
+         <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions2"></highcharts-chart>
+      </div>
+      <div class="period-chart-wrapper">
+         <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions"></highcharts-chart>
+      </div>
    </div>
 
    <div class="chart-select-wrapper" *ngIf="compareClicked && !isShowPeriodChart">
