@@ -1,19 +1,49 @@
 <div class="chart-bounds-wrapper compare">
+   <div class="periods-panel">
+      <div *ngIf="!isShowPeriodChart">
+         <ng-select [items]="periods" bindLabel="name" [clearable]="false" [ngModel]="currentPeriod" (change)="selectPeriod($event)"></ng-select>
+         <button *ngIf="!isAddPeriodMode" (click)="addPeriodModeOn()" [disabled]="!isAllowAddPeriod">Додати період</button>
+
+         <input *ngIf="isAddPeriodMode" class="new-period-name" type="text" [(ngModel)]="newPeriod.name" placeholder="Назва періоду">
+         <button *ngIf="isAddPeriodMode" (click)="addPeriod()">Додати</button>
+         <button *ngIf="isAddPeriodMode" (click)="cancelAddPeriod()">Скасувати</button>
+      </div>
+
+      <button *ngIf="!isShowPeriodChart" [disabled]="!isAllowComparePeriods" (click)="comparePeriods()">Порівняти періоди</button>
+      <button *ngIf="isShowPeriodChart" (click)="finishComparePeriods()" [style.height]="'60px'">Повернутись до поточного періоду</button>
+   </div>
+
    <div class="bounds-wrapper">
       <div class="strategy-select-box">
          <div class="strategy-label">Діагностична стратегія 1</div>
-         <ng-select [clearable]="false" [items]="compareList1" bindLabel="name" [(ngModel)]="strategy1"></ng-select>
+         <div *ngIf="isCompareMode" class="strategy-name">{{currentPeriod.strategy1.name}}</div>
+         <ng-select *ngIf="!isCompareMode"
+                    [clearable]="false"
+                    [items]="compareList1"
+                    bindLabel="name"
+                    [(ngModel)]="currentPeriod.strategy1"
+                    placeholder="Оберіть старегію ..."
+         ></ng-select>
       </div>
 
       <div class="strategy-select-box">
          <div class="strategy-label">Діагностична стратегія 2</div>
-         <ng-select [clearable]="false" [items]="compareList2" bindLabel="name" [(ngModel)]="strategy2"></ng-select>
+         <div *ngIf="isCompareMode" class="strategy-name">{{currentPeriod.strategy2.name}}</div>
+         <ng-select *ngIf="!isCompareMode"
+                    [clearable]="false"
+                    [items]="compareList2"
+                    bindLabel="name"
+                    [(ngModel)]="currentPeriod.strategy2"
+                    placeholder="Оберіть старегію ..."
+         ></ng-select>
       </div>
    </div>
 
-   <div class="bounds-wrapper">
+   <button *ngIf="!isCompareMode" (click)="compareModeOn()" [disabled]="!currentPeriod.strategy1 || !currentPeriod.strategy2">Продовжити</button>
+
+   <div class="bounds-wrapper" *ngIf="isCompareMode && !isShowPeriodChart">
       <div class="bounds">
-         <div class="param-bounds" *ngFor="let param of strategy1.paramsBounds">
+         <div class="param-bounds" *ngFor="let param of currentPeriod.strategy1.paramsBounds">
             <div class="label">{{param.name}}</div>
             <div class="bounds-inputs">
                <input class="min" type="number" [(ngModel)]="param.minBound">
@@ -22,8 +52,8 @@
          </div>
       </div>
 
-      <div class="bounds">
-         <div class="param-bounds" *ngFor="let param of strategy2.paramsBounds">
+      <div class="bounds" *ngIf="isCompareMode">
+         <div class="param-bounds" *ngFor="let param of currentPeriod.strategy2.paramsBounds">
             <div class="label">{{param.name}}</div>
             <div class="bounds-inputs">
                <input class="min" type="number" [(ngModel)]="param.minBound">
@@ -33,9 +63,19 @@
       </div>
    </div>
 
-   <button (click)="compare()">Розрахувати</button>
+   <button *ngIf="isCompareMode && !isShowPeriodChart" (click)="compare()">Розрахувати</button>
 
-   <div class="chart-select-wrapper" *ngIf="compareClicked">
+   <div class="periods-chart-wrapper" *ngIf="isShowPeriodChart">
+      <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions1"></highcharts-chart>
+
+      <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions2"></highcharts-chart>
+
+      <highcharts-chart [Highcharts]="highcharts" [options]="periodsChartOptions"></highcharts-chart>
+   </div>
+
+   <div class="chart-select-wrapper" *ngIf="compareClicked && !isShowPeriodChart">
+
+
       <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions"></highcharts-chart>
 
       <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions1"></highcharts-chart>

@@ -19,7 +19,7 @@ function createWindow() {
 
    // win.removeMenu();
 
-   win.loadURL(`http://localhost:4200/`);
+   win.loadURL(`http://localhost:4300/`);
    // win.loadURL(`file://${__dirname}/dist/ngBuild/index.html`);
    // win.loadFile(`./dist/ngBuild/index.html`);
 

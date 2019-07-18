@@ -9,6 +9,29 @@ $color-warn: #eb7f00
 div
    display: flex
 
+
+.periods-panel
+   width: 100%
+   margin-bottom: 50px
+   flex-direction: row
+   align-items: center
+   justify-content: space-between
+
+   .ng-select
+      width: 200px
+      margin-right: 10px
+
+   input.new-period-name
+      border: 1px solid #cccccc
+      border-radius: 4px
+      padding-left: 10px
+      font-size: 16px
+
+
+   button
+      margin: 0
+      height: 36px
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button
    -webkit-appearance: none
@@ -25,6 +48,16 @@ input[type=number]::-webkit-outer-spin-button
 
       .strategy-label
          align-items: center
+
+      .strategy-name
+         width: 100%
+         border: 1px solid #cccccc
+         padding: 5px
+         border-radius: 4px
+         height: 48px
+
+         align-items: center
+         justify-content: center
 
    button
       margin-left: 10px

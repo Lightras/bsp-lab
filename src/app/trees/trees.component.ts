@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import addMore from 'highcharts/highcharts-more';
 import deepcopy from 'ts-deepcopy';
+
+addMore(Highcharts)
 
 @Component({
    selector: 'app-trees',
@@ -8,7 +11,6 @@ import deepcopy from 'ts-deepcopy';
    styleUrls: ['./trees.component.sass']
 })
 export class TreesComponent implements OnInit {
-
    constructor() { }
 
    highcharts = Highcharts;
@@ -22,22 +24,72 @@ export class TreesComponent implements OnInit {
    compareList1: Strategy[];
    compareList2: Strategy[];
 
-   strategy1: Strategy;
-   strategy2: Strategy;
-
    compareClicked = false;
-
-   EUValues1: any;
-   EUValues2: any;
+   isCompareMode = false;
 
    chartOptions1: any;
    chartOptions2: any;
 
+   currentPeriod: Period;
+   periods: Period[];
+   newPeriod: Period;
+   isAddPeriodMode: boolean;
+   isAllowAddPeriod: boolean;
+   isAllowComparePeriods: boolean;
+
    callCount = 0;
 
-   N = 500;
    L = 500;
    W = 5;
+   isShowPeriodChart: boolean;
+   periodsChartOptions: any = {
+
+      credits: {
+         enabled: false
+      },
+
+      chart: {
+         type: 'columnrange',
+         inverted: true
+      },
+
+      title: {
+         text: ''
+      },
+
+      xAxis: {
+         categories: []
+      },
+
+      yAxis: {
+         title: {
+            text: ''
+         }
+      },
+
+      tooltip: {
+         valueSuffix: ''
+      },
+
+      plotOptions: {
+         columnrange: {
+            dataLabels: {
+               enabled: true,
+               format: ''
+            }
+         }
+      },
+
+      legend: {
+         enabled: false
+      },
+
+      series: [{
+         name: '',
+         data: []
+      }]
+
+   };
 
    ngOnInit() {
       this.parameters = [
@@ -169,8 +221,21 @@ export class TreesComponent implements OnInit {
       this.compareList1 = deepcopy(this.strategies);
       this.compareList2 = deepcopy(this.strategies);
 
-      this.strategy1 = {};
-      this.strategy2 = {};
+      this.currentPeriod = {
+         name: 'default',
+         strategy1: null,
+         strategy2: null
+      };
+      
+      this.periods = [this.currentPeriod];
+
+      // this.testFunc();
+   }
+   
+   
+
+   compareModeOn() {
+      this.isCompareMode = true;
    }
 
    compare() {
@@ -178,6 +243,8 @@ export class TreesComponent implements OnInit {
 
       this.buildChart(this.currentParamCode);
 
+      this.isAllowAddPeriod = true;
+      this.isAllowComparePeriods = this.periods.length > 1;
       this.compareClicked = true;
    }
 
@@ -215,8 +282,14 @@ export class TreesComponent implements OnInit {
          data1.push([value, relationValues[1]]);
          data2.push([value, relationValues[2]]);
       });
+      
+      console.log('data1: ', data1);
 
-      // console.log();
+      this.currentPeriod.periodData = {
+         EUr: [Math.min(... data.map(p => p[1])), Math.max(... data.map(p => p[1]))],
+         EU1: [Math.min(... data1.map(p => p[1])), Math.max(... data2.map(p => p[1]))],
+         EU2: [Math.min(... data2.map(p => p[1])), Math.max(... data2.map(p => p[1]))]
+      };
 
       this.chartOptions = this.buildChartOptions(data);
       this.chartOptions1 = this.buildChartOptions(data1);
@@ -465,12 +538,12 @@ export class TreesComponent implements OnInit {
    }
 
    calcRelation(parameter: Parameter, value: number) {
-      const params1 = this.randomize_params(this.strategy1, parameter.code, value);
-      const params2 = this.randomize_params(this.strategy2, parameter.code, value);
+      const params1 = this.randomize_params(this.currentPeriod.strategy1, parameter.code, value);
+      const params2 = this.randomize_params(this.currentPeriod.strategy2, parameter.code, value);
 
       // @ts-ignore
-      const EUi = this['EU' + this.strategy1.id](...params1);
-      const EUj = this['EU' + this.strategy2.id](...params2);
+      const EUi = this['EU' + this.currentPeriod.strategy1.id](...params1);
+      const EUj = this['EU' + this.currentPeriod.strategy2.id](...params2);
       const relation = EUi / EUj;
 
       // todo Why does it produce outstanding values? Do we need these bounds?
@@ -635,6 +708,63 @@ export class TreesComponent implements OnInit {
             (Pi-Pij)*(1-Spi)*Sej*Utp +
             (1-Pi-Pj+Pij)*(1-Spi)*(1-Spj)*Ufp;
    }
+
+   comparePeriods() {
+      this.isCompareMode = true;
+
+      this.periodsChartOptions.xAxis.categories = this.periods.map(p => p.name);
+      this.periodsChartOptions.series[0].data = this.periods.map(p => p.periodData.EU1);
+
+      this.isShowPeriodChart = true;
+   }
+
+   finishComparePeriods() {
+      this.isCompareMode = true;
+      console.log('this.isCompareMode: ', this.isCompareMode);
+      this.isShowPeriodChart = false;
+   }
+
+   testFunc() {
+      this.currentPeriod = {
+         name: 'default',
+         strategy1: this.strategies[0],
+         strategy2: this.strategies[1]
+      };
+
+      this.periods = [this.currentPeriod];
+
+      this.compare();
+      this.comparePeriods();
+   }
+
+   addPeriodModeOn() {
+      this.newPeriod = {
+         name: '',
+         strategy1: this.currentPeriod.strategy1,
+         strategy2: this.currentPeriod.strategy2
+      };
+
+      this.isAddPeriodMode = true;
+   }
+
+   addPeriod() {
+      this.isCompareMode = true;
+      this.periods = [...this.periods, deepcopy(this.newPeriod)];
+      this.currentPeriod = this.periods[this.periods.length - 1];
+
+      this.compareClicked = false;
+      this.isAddPeriodMode = false;
+      this.isAllowAddPeriod = false;
+   }
+
+   cancelAddPeriod() {
+      this.isAddPeriodMode = false;
+   }
+
+   selectPeriod(period: Period) {
+      console.log('period: ', period);
+      this.currentPeriod = period;
+   }
 }
 
 interface Strategy {
@@ -657,4 +787,17 @@ interface Parameter {
    name: string;
    minAllowed: number;
    maxAllowed: number;
+}
+
+interface Period {
+   name: string;
+
+   strategy1: Strategy;
+   strategy2: Strategy;
+
+   periodData?: {
+      EUr: [number, number],
+      EU1: [number, number],
+      EU2: [number, number]
+   };
 }
