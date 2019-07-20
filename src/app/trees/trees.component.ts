@@ -69,7 +69,8 @@ export class TreesComponent implements OnInit {
       },
 
       tooltip: {
-         valueSuffix: ''
+         valueSuffix: '',
+         pointFormat: 'x: <b>{point.x:.3f}</b><br/>y: <b>{point.y:.3f}</b><br/>'
       },
 
       plotOptions: {
@@ -345,6 +346,10 @@ export class TreesComponent implements OnInit {
 
          legend: {
             enabled: false
+         },
+
+         tooltip: {
+            pointFormat: 'x: <b>{point.x:.3f}</b><br/>y: <b>{point.y:.3f}</b><br/>'
          },
 
          plotOptions: {
@@ -784,8 +789,7 @@ export class TreesComponent implements OnInit {
       this.isAddPeriodMode = false;
    }
 
-   selectPeriod(period: Period) {
-      console.log('period: ', period);
+   selectPeriod(period) {
       this.currentPeriod = period;
    }
 }
