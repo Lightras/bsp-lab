@@ -241,7 +241,7 @@ export class TreesComponent implements OnInit {
       this.compareList2 = deepcopy(this.strategies);
 
       this.currentPeriod = {
-         name: 'default',
+         name: '',
          strategy1: null,
          strategy2: null
       };
@@ -277,7 +277,7 @@ export class TreesComponent implements OnInit {
       let xLevels = [];
       let x = [];
       let i = 0;
-      const step = (parameter.maxAllowed - parameter.minAllowed) / this.L;
+      const step = parseFloat(((parameter.maxAllowed - parameter.minAllowed) / this.L).toFixed(3));
       let lastValue = parameter.minAllowed;
 
       while (i < this.L - 1) {
