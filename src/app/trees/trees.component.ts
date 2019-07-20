@@ -95,6 +95,7 @@ export class TreesComponent implements OnInit {
 
    periodsChartOptions1: any;
    periodsChartOptions2: any;
+   euChartUpdateFlag: boolean;
 
    ngOnInit() {
       this.periodsChartOptions1 = deepcopy(this.periodsChartOptions);
@@ -264,6 +265,8 @@ export class TreesComponent implements OnInit {
       this.isAllowAddPeriod = true;
       this.isAllowComparePeriods = this.periods.length > 1;
       this.compareClicked = true;
+
+      this.euChartUpdateFlag = true;
    }
 
    buildChart(currentParamCode) {
@@ -292,8 +295,6 @@ export class TreesComponent implements OnInit {
       });
 
       x.forEach(value => {
-         this.callCount = 0;
-
          const relationValues = this.calcRelation(parameter, value);
 
          data.push([value, relationValues[0]]);
@@ -573,12 +574,6 @@ export class TreesComponent implements OnInit {
       // if (true) {
          return [relation, EUi, EUj];
       } else {
-         this.callCount++;
-         
-         if (this.callCount > 100) {
-            console.log('params2: ', params2);
-         }
-
          return this.calcRelation(parameter, value);
       }
    }

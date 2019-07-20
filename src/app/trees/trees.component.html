@@ -80,11 +80,11 @@
    <div class="chart-select-wrapper" *ngIf="compareClicked && !isShowPeriodChart">
 
 
-      <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions"></highcharts-chart>
+      <highcharts-chart [(update)]="euChartUpdateFlag" [Highcharts]="highcharts" [options]="chartOptions"></highcharts-chart>
 
-      <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions1"></highcharts-chart>
+      <highcharts-chart [(update)]="euChartUpdateFlag" [Highcharts]="highcharts" [options]="chartOptions1"></highcharts-chart>
 
-      <highcharts-chart [Highcharts]="highcharts" [options]="chartOptions2"></highcharts-chart>
+      <highcharts-chart [(update)]="euChartUpdateFlag" [Highcharts]="highcharts" [options]="chartOptions2"></highcharts-chart>
 
       <ng-select [clearable]="false" bindValue="code"
                  [items]="parameters" bindLabel="name"
