@@ -56,6 +56,7 @@ export class RocComponent implements OnInit {
 
          series: [{
             name: '',
+            findNearestPointBy: 'xy',
             data: (this.chartData.x.map((v, i) => {
                return {x: v, y: this.chartData.y[i]};
             }).sort((a, b) => a.x - b.x)
