@@ -210,12 +210,14 @@ export class TestsInputComponent implements OnInit {
    setTypeContinuous() {
       this.resultsType = 'continuous';
 
+      // this.samples = [true, true, false, false, false, true, true, false];
+      //
       // this.tests = [
       //    {
-      //       results: [1, 17, 2, 13, 9]
+      //       results: [6, 5, 3, 2, 1, 4, 5, 4]
       //    },
       //    {
-      //       results: [3, 19, 2, 7, 8]
+      //       results: [9, 4, 3, 1, 4, 6, 3, 1]
       //    }
       // ];
 
@@ -239,18 +241,20 @@ export class TestsInputComponent implements OnInit {
       }
       this.cutOffsArray.push(this.max);
 
-      this.tests.forEach(t => t.chartData = {x: [], y: []});
+      this.tests.forEach(t => {
+         t.chartData = {x: [], y: []};
+         t.optimum = {distance: Number.POSITIVE_INFINITY};
+      });
 
-      this.cutOffsArray.forEach((cutOff, index) => {
+      this.cutOffsArray.forEach((cutOff) => {
          this.cutOff = cutOff;
          this.calculateAllTestsCharacteristics();
 
-         this.tests.forEach(t => t.optimum = {distance: Number.POSITIVE_INFINITY});
-
          this.tests.forEach((t, j) => {
             const distance = Math.sqrt(Math.pow(1 - t.characteristics.se, 2) + Math.pow(1 - t.characteristics.sp, 2));
+            
             if (distance < t.optimum.distance) {
-               t.optimum = {
+               this.tests[j].optimum = {
                   distance,
                   cutoff: cutOff,
                   se: t.characteristics.se,
@@ -263,7 +267,6 @@ export class TestsInputComponent implements OnInit {
          });
       });
 
-      console.log('this.tests: ', this.tests);
       this.showCurves = true;
    }
 

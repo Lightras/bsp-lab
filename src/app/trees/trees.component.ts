@@ -71,7 +71,8 @@ export class TreesComponent implements OnInit {
       },
 
       tooltip: {
-         valueSuffix: ''
+         valueSuffix: '',
+         pointFormat: 'x: <b>{point.x:.3f}</b><br/>y: <b>{point.y:.3f}</b><br/>'
       },
 
       plotOptions: {
@@ -96,6 +97,7 @@ export class TreesComponent implements OnInit {
 
    periodsChartOptions1: any;
    periodsChartOptions2: any;
+   euChartUpdateFlag: boolean;
 
    ngOnInit() {
       this.periodsChartOptions1 = deepcopy(this.periodsChartOptions);
@@ -241,7 +243,7 @@ export class TreesComponent implements OnInit {
       this.compareList2 = deepcopy(this.strategies);
 
       this.currentPeriod = {
-         name: 'default',
+         name: '',
          strategy1: null,
          strategy2: null
       };
@@ -265,6 +267,8 @@ export class TreesComponent implements OnInit {
       this.isAllowAddPeriod = true;
       this.isAllowComparePeriods = this.periods.length > 1;
       this.compareClicked = true;
+
+      this.euChartUpdateFlag = true;
    }
 
    buildChart(currentParamCode) {
@@ -275,7 +279,7 @@ export class TreesComponent implements OnInit {
       let xLevels = [];
       let x = [];
       let i = 0;
-      const step = (parameter.maxAllowed - parameter.minAllowed) / this.L;
+      const step = parseFloat(((parameter.maxAllowed - parameter.minAllowed) / this.L).toFixed(3));
       let lastValue = parameter.minAllowed;
 
       while (i < this.L - 1) {
@@ -293,8 +297,6 @@ export class TreesComponent implements OnInit {
       });
 
       x.forEach(value => {
-         this.callCount = 0;
-
          const relationValues = this.calcRelation(parameter, value);
 
          data.push([value, relationValues[0]]);
@@ -385,6 +387,10 @@ export class TreesComponent implements OnInit {
 
          legend: {
             enabled: false
+         },
+
+         tooltip: {
+            pointFormat: 'x: <b>{point.x:.3f}</b><br/>y: <b>{point.y:.3f}</b><br/>'
          },
 
          plotOptions: {
@@ -611,12 +617,6 @@ export class TreesComponent implements OnInit {
       // if (true) {
          return [relation, EUi, EUj];
       } else {
-         this.callCount++;
-         
-         if (this.callCount > 100) {
-            console.log('params2: ', params2);
-         }
-
          return this.calcRelation(parameter, value);
       }
    }
@@ -827,8 +827,7 @@ export class TreesComponent implements OnInit {
       this.isAddPeriodMode = false;
    }
 
-   selectPeriod(period: Period) {
-      console.log('period: ', period);
+   selectPeriod(period) {
       this.currentPeriod = period;
    }
 }

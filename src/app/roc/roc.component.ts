@@ -22,6 +22,10 @@ export class RocComponent implements OnInit {
             enabled: false
          },
 
+         chart: {
+            spacingLeft: 120
+         },
+
          title: {
             text: 'ROC-крива діагностичного тесту № ' + (this.index + 1)
          },
@@ -31,7 +35,9 @@ export class RocComponent implements OnInit {
                text: '1 - Специфічність'
             },
             min: 0,
-            max: 1
+            max: 1,
+            width: 300,
+            height: 300
          },
 
          yAxis: {
@@ -39,7 +45,14 @@ export class RocComponent implements OnInit {
                text: 'Чутливість'
             },
             min: 0,
-            max: 1
+            max: 1,
+            height: 300,
+            width: 302
+         },
+
+         tooltip: {
+            pointFormat: 'x: <b>{point.x:.3f}</b><br/>y: <b>{point.y:.3f}</b><br/>',
+            valueDecimals: 3
          },
 
          plotOptions: {
@@ -59,11 +72,11 @@ export class RocComponent implements OnInit {
             findNearestPointBy: 'xy',
             data: (this.chartData.x.map((v, i) => {
                return {x: v, y: this.chartData.y[i]};
-            }).sort((a, b) => a.x - b.x)
+            }).sort((a, b) => {
+               return (a.x - b.x) ? (a.x - b.x) : (a.y - b.y);
+            })
 )         }]
       };
-
-      console.log('this.chartOptions: ', this.chartOptions.series[0].data);
    }
 
 }
