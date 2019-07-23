@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import addMore from 'highcharts/highcharts-more';
-import exporting from 'highcharts/modules/exporting'
+import exporting from 'highcharts/modules/exporting';
 import deepcopy from 'ts-deepcopy';
 
 addMore(Highcharts);
@@ -48,6 +48,26 @@ export class TreesComponent implements OnInit {
 
       credits: {
          enabled: false
+      },
+
+      lang: {
+         downloadPDF: 'Завантажити в PDF',
+         contextButtonTitle: 'Опції завантаження',
+         downloadPNG: 'Завантажити як зображення',
+         printChart: 'Роздрукувати',
+         viewFullscreen: 'Показати на весь екран'
+      },
+
+      exporting: {
+         enabled: true,
+         buttons: {
+            contextButton: {
+               menuItems: ['downloadPNG', 'downloadPDF', 'separator', 'printChart'],
+               symbol: 'download',
+               x: -400,
+               y: 0
+            }
+         }
       },
 
       chart: {
@@ -250,7 +270,7 @@ export class TreesComponent implements OnInit {
       
       this.periods = [this.currentPeriod];
 
-      this.testFunc();
+      // this.testFunc();
    }
    
    
@@ -361,7 +381,7 @@ export class TreesComponent implements OnInit {
             enabled: true,
             buttons: {
                contextButton: {
-                  menuItems: ['downloadPNG', 'downloadPDF', 'separator', 'printChart', 'viewFullscreen'],
+                  menuItems: ['downloadPNG', 'downloadPDF', 'separator', 'printChart'],
                   symbol: 'download',
                   x: -550,
                   y: 0
@@ -800,7 +820,7 @@ export class TreesComponent implements OnInit {
       this.periods = [this.currentPeriod, this.currentPeriod, this.currentPeriod, this.currentPeriod, this.currentPeriod];
 
       this.compare();
-      // this.comparePeriods();
+      this.comparePeriods();
    }
 
    addPeriodModeOn() {

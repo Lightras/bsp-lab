@@ -210,18 +210,18 @@ export class TestsInputComponent implements OnInit {
    setTypeContinuous() {
       this.resultsType = 'continuous';
 
-      // this.samples = [true, true, false, false, false, true, true, false];
-      //
-      // this.tests = [
-      //    {
-      //       results: [6, 5, 3, 2, 1, 4, 5, 4]
-      //    },
-      //    {
-      //       results: [9, 4, 3, 1, 4, 6, 3, 1]
-      //    }
-      // ];
+      this.samples = [true, true, false, false, false, true, true, false];
 
-      this.tests = [];
+      this.tests = [
+         {
+            results: [6, 5, 3, 2, 1, 4, 5, 4]
+         },
+         {
+            results: [9, 4, 3, 1, 4, 6, 3, 1]
+         }
+      ];
+
+      // this.tests = [];
       this.dc.detectChanges();
    }
 
