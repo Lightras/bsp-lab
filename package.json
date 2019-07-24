@@ -1,6 +1,6 @@
 {
    "name": "bsplab",
-   "version": "0.1.0",
+   "version": "0.1.2",
    "main": "main.ts",
    "scripts": {
       "ng": "ng",
@@ -15,7 +15,7 @@
       "publish-test": "build -p always"
    },
    "build": {
-      "productName": "Фармакоекономічний аналіз",
+      "productName": "Фармакоекономічна оцінка",
       "win": {
          "target": [
             {

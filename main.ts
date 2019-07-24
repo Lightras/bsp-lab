@@ -11,16 +11,16 @@ function createWindow() {
       width: 1300,
       height: 700,
       minWidth: 1190,
-      title: 'Фармакоекономічний аналіз технологій етіологічної діагностики вірусних інфекцій',
+      title: 'Фармакоекономічна оцінка технологій етіологічної діагностики вірусних інфекцій',
       webPreferences: {
-         devTools: true
+         devTools: false
       }
    });
 
-   // win.removeMenu();
+   win.removeMenu();
 
-   win.loadURL(`http://localhost:4200/`);
-   // win.loadFile(`./dist/ngBuild/index.html`);
+   // win.loadURL(`http://localhost:4200/`);
+   win.loadFile(`./dist/ngBuild/index.html`);
 
    // uncomment below to open the DevTools.
    win.webContents.openDevTools();
