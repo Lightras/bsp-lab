@@ -3,26 +3,24 @@ import { NgModule } from '@angular/core';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 import { AppComponent } from './app.component';
-import { TestsInputComponent } from './tests-input/tests-input.component';
 import {FormsModule} from '@angular/forms';
+import {CharacteristicsModule} from './characteristics/characteristics.module';
+import {StrategiesComponent} from './strategies/strategies.component';
 import {HighchartsChartModule} from 'highcharts-angular';
-import { RocComponent } from './roc/roc.component';
-import { TreesComponent } from './trees/trees.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    TestsInputComponent,
-    RocComponent,
-    TreesComponent
-  ],
+   declarations: [
+      AppComponent,
+      StrategiesComponent,
+   ],
    imports: [
       BrowserModule,
       FormsModule,
-      HighchartsChartModule,
-      NgSelectModule
+      NgSelectModule,
+      CharacteristicsModule,
+      HighchartsChartModule
    ],
-  providers: [],
-  bootstrap: [AppComponent]
+   providers: [],
+   bootstrap: [AppComponent]
 })
 export class AppModule { }

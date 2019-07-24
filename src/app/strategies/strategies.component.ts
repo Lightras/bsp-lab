@@ -3,17 +3,23 @@ import * as Highcharts from 'highcharts';
 import addMore from 'highcharts/highcharts-more';
 import exporting from 'highcharts/modules/exporting';
 import deepcopy from 'ts-deepcopy';
+import {EuFormulasService} from './eu-formulas.service';
+import {InitialState} from './initial-state';
+import {Parameter, ParameterWithBounds, Period, Strategy} from '../interfaces';
 
 addMore(Highcharts);
 exporting(Highcharts);
 
 @Component({
-   selector: 'app-trees',
-   templateUrl: './trees.component.html',
-   styleUrls: ['./trees.component.sass']
+   selector: 'app-strategies',
+   templateUrl: './strategies.component.html',
+   styleUrls: ['./strategies.component.sass']
 })
-export class TreesComponent implements OnInit {
-   constructor() { }
+export class StrategiesComponent implements OnInit {
+   constructor(
+      private euFunctions: EuFormulasService,
+      private _init: InitialState
+   ) { }
 
    highcharts = Highcharts;
    chartOptions: any;
@@ -38,8 +44,6 @@ export class TreesComponent implements OnInit {
    isAddPeriodMode: boolean;
    isAllowAddPeriod: boolean;
    isAllowComparePeriods: boolean;
-
-   callCount = 0;
 
    L = 500;
    W = 5;
@@ -120,6 +124,9 @@ export class TreesComponent implements OnInit {
    euChartUpdateFlag: boolean;
 
    ngOnInit() {
+      this.parameters = this._init.parameters;
+      this.strategies = this._init.strategies;
+
       this.periodsChartOptions1 = deepcopy(this.periodsChartOptions);
       this.periodsChartOptions2 = deepcopy(this.periodsChartOptions);
 
@@ -132,122 +139,6 @@ export class TreesComponent implements OnInit {
       this.periodsChartOptions2.yAxis.title.text = 'Очікувана корисність другої стратегії';
 
       this.periodsChartOptions.yAxis.title.text = 'Відношення очікуваних корисностей першої і другої стратегій';
-
-      this.parameters = [
-         {
-            code: 'Pi',
-            name: 'Діагностичний спектр і-того тесту',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Pj',
-            name: 'Діагностичний спектр j-того тесту',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Sei',
-            name: 'Чутливість і-того тесту',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Sej',
-            name: 'Чутливість j-того тесту',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Spi',
-            name: 'Специфічність і-того тесту',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Spj',
-            name: 'Специфічність j-того тесту',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Utp',
-            name: 'Корисність дійснопозитивного результату',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Ufp',
-            name: 'Корисність хибнопозитивного результату',
-            minAllowed: -1,
-            maxAllowed: 0,
-         },
-         {
-            code: 'Utn',
-            name: 'Корисність дійснонегативного результату',
-            minAllowed: 0,
-            maxAllowed: 1,
-         },
-         {
-            code: 'Ufn',
-            name: 'Корисність хибнонегативного результату',
-            minAllowed: -1,
-            maxAllowed: 0,
-         }
-      ];
-
-      // @ts-ignore
-      this.strategies = [
-         {
-            id: 0,
-            name: 'Одна діагностична технологія'
-         },
-         {
-            id: 1,
-            name: 'Діагностичні спектри рівні, верифікація негативного результату і-того тесту'
-         },
-         {
-            id: 2,
-            name: 'Діагностичні спектри рівні, верифікація позитивного результату і-того тесту'
-         },
-         {
-            id: 3,
-            name: 'Діагностичні спектри різні і не перетинаються, верифікація негативного результату і-того тесту'
-         },
-         {
-            id: 4,
-            name: 'Діагностичні спектри різні і не перетинаються, верифікація позитивного результату і-того тесту'
-         },
-         {
-            id: 5,
-            name: 'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація негативного результату і-того тесту'
-         },
-         {
-            id: 6,
-            name: 'Діагностичний спектр j-того тесту входить до діагностичного спектру і-того тесту, верифікація позитивного результату і-того тесту'
-         },
-         {
-            id: 7,
-            name: 'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація негативного результату і-того тесту'
-         },
-         {
-            id: 8,
-            name: 'Діагностичний спектр і-того тесту входить до діагностичного спектру j-того тесту, верифікація позитивного результату і-того тесту'
-         },
-         {
-            id: 9,
-            name: 'Діагностичні спектри частково перетинаються, верифікація негативного результату і-того тесту'
-         },
-         {
-            id: 10,
-            name: 'Діагностичні спектри частково перетинаються, верифікація позитивного результату і-того тесту'
-         },
-         {
-            id: 11,
-            name: 'Паралельна діагностика (діагностичні спектри частково перетинаються)'
-         },
-
-      ];
 
       this.strategies.forEach(s => {
          s.paramsBounds = this.parameters.map((p: ParameterWithBounds) => {
@@ -288,7 +179,7 @@ export class TreesComponent implements OnInit {
       this.isAllowComparePeriods = this.periods.length > 1;
       this.compareClicked = true;
 
-      this.euChartUpdateFlag = true;
+      // this.euChartUpdateFlag = true;
    }
 
    buildChart(currentParamCode) {
@@ -324,8 +215,6 @@ export class TreesComponent implements OnInit {
          data2.push([value, relationValues[2]]);
       });
       
-      console.log('data1: ', data1);
-
       this.currentPeriod.periodData = {
          EUr: [Math.min(... data.map(p => p[1])), Math.max(... data.map(p => p[1]))],
          EU1: [Math.min(... data1.map(p => p[1])), Math.max(... data2.map(p => p[1]))],
@@ -338,6 +227,8 @@ export class TreesComponent implements OnInit {
 
       this.chartOptions1.yAxis.title.text = 'Очікувана корисність першої стратегії';
       this.chartOptions2.yAxis.title.text = 'Очікувана корисність другої стратегії';
+
+      this.euChartUpdateFlag = true;
    }
 
    buildChartOptions(data) {
@@ -438,10 +329,6 @@ export class TreesComponent implements OnInit {
 
    boundedRandom(min, max) {
       return min + (max - min) * Math.random();
-   }
-
-   logError(e) {
-      console.error('error: ', e);
    }
 
    randomize_params(strategy: Strategy, currentParamCode: string, currentParamValue: number): number[] {
@@ -628,8 +515,8 @@ export class TreesComponent implements OnInit {
       const params2 = this.randomize_params(this.currentPeriod.strategy2, parameter.code, value);
 
       // @ts-ignore
-      const EUi = this['EU' + this.currentPeriod.strategy1.id](...params1);
-      const EUj = this['EU' + this.currentPeriod.strategy2.id](...params2);
+      const EUi = this.euFunctions['EU' + this.currentPeriod.strategy1.id](...params1);
+      const EUj = this.euFunctions['EU' + this.currentPeriod.strategy2.id](...params2);
       const relation = EUi / EUj;
 
       // todo Why does it produce outstanding values? Do we need these bounds?
@@ -641,152 +528,8 @@ export class TreesComponent implements OnInit {
       }
    }
 
-   EU0(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp + (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn;
-   }
-
-   EU1(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      // eq v n i
-      return Pi * Sei * Utp + (1 - Pi) * (1 - Spi) * Ufp +
-         (1 - Pi) * Spi * ((1 - Spj) * Ufp + Spj * Utn) +
-         Pi * (1 - Sei) * (Sej * Utp + (1 - Sej) * Ufn);
-   }
-
-   EU2(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      // eq v p i
-      return Pi * Sei * (Sej * Utp + (1 - Sej) * Ufn) +
-         (1 - Pi) * (1 - Spi) * ((1 - Spj) * Ufp + Spj * Utn) +
-         (1 - Pi) * Spi * Utn + Pi * (1 - Sei) * Ufn;
-   }
-
-   EU3(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      if (Pj > 1-Pi) {
-         this.logError(3);
-      }
-      // ni v n i
-      return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp + (1-Pi)*Spi*(Pj/(1-Pi)*Sej*Utp + (1-Pi-Pj)/(1-Pi)*(1-Spj)*Ufp + (1-Pi-Pj)/(1-Pi)*Spj*Utn +
-         Pj/(1-Pi)*(1-Sej)*Ufn) + Pi*(1-Sei)*(Spj*Utn + (1-Spj)*Ufp);
-   }
-
-   EU4(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      if (Pj > 1-Pi) {
-         this.logError(4);
-      }
-      // ni v p i
-      return (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn + (1-Pi)*(1-Spi)*(Pj/(1-Pi)*Sej*Utp + (1-Pi-Pj)/(1-Pi)*(1-Spj)*Ufp +
-         (1-Pi-Pj)/(1-Pi)*Spj*Utn + Pj/(1-Pi)*(1-Sej)*Ufn) + Pi*Sei*(Sej*Utn + (1-Sej)*Ufp);
-   }
-
-   EU5(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      if (Pj > Pi) {
-         this.logError(5);
-      }
-      // j<i v n i
-      return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp + (1-Pi)*Spi*(Spj*Utn + (1-Spj)*Ufn) + Pi*(1-Sei)*((Pj/Pi)*Sej)*Utp +
-         (Pi-Pj)/Pi*(1-Spj)*Ufp + (Pi-Pj)/Pi*Spj*Utn + (Pj/Pi)*(1-Sej)*Ufn;
-   }
-
-   EU6(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      if (Pj > Pi) {
-         this.logError(6);
-      }
-      // j<i v p i
-      return (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn + (1-Pi)*(1-Spi)*(Spj*Utn + (1-Spj)*Ufn) +
-         Pi*Sei*((Pj/Pi)*Sej*Utp + (Pi-Pj)*Pi*(1-Spj)*Ufp + (Pi-Pj)/Pi*Spj*Utn + (Pj/Pi)*(1-Sej)*Ufn);
-   }
-
-   EU7(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      if (Pi > Pj) {
-         this.logError(7);
-      }
-      // i<j v n i
-      return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp +
-         (1-Pi)*Spi*((Pj-Pi)/(1-Pi)*Sej)*Utp + (1-Pj)/(1-Pi)*(1-Spj)*Ufp + (1-Pj)/(1-Pi)*Spj*Utn + (Pj-Pi)/(1-Pi)*(1-Sej)*Ufn +
-         Pi*(1-Sei)*(Sej*Utp + (1-Sej)*Ufn);
-   }
-
-   EU8(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn) {
-      if (Pi > Pj) {
-         this.logError(8);
-      }
-      // i<j v p i
-      return (1-Pi)*Spi*Utn +
-         Pi*(1-Sei)*Ufn +
-         (1-Pi)*(1-Spi)*(
-            (Pj-Pi)/(1-Pi)*Sej*Utp +
-            (1-Pj)/(1-Pi)*(1-Spj)*Ufp +
-            (1-Pj)/(1-Pi)*Spj*Utn +
-            (Pj-Pi)/(1-Pi)*(1-Sej)*Ufn
-         ) +
-         Pi*Sei*(
-            Sej*Utp + (1-Sej)*Ufn
-         );
-   }
-
-   EU9(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
-      if (Pij > Pi || Pj > (Pij + 1 - Pi)) {
-         this.logError(9)
-      }
-      // i v n i
-      return Pi*Sei*Utp + (1-Pi)*(1-Spi)*Ufp +
-         (1-Pi)*Spi*(
-            (Pj-Pij)/(1-Pi)*Sej*Utp +
-            (1-Pi-Pj+Pij)/(1-Pi)*(1-Spj)*Ufp +
-            (1-Pi-Pj+Pij)/(1-Pi)*(1-Pi)*Spj*Utn +
-            (Pj-Pij)/(1-Pi)*(1-Sej)*Ufn
-         ) +
-         Pi*(1-Sei)*(
-            Pij/Pi*Sej*Utp +
-            (Pi-Pij)/Pi*(1-Spj)*Ufp +
-            (Pi-Pij)/Pi*Spj*Utn +
-            Pij/Pi*(1-Sej)*Ufn
-         );
-   }
-
-   EU10(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
-      if (Pij > Pi || Pj > (Pij + 1 - Pi)) {
-         this.logError(10)
-      }
-      // i v p i
-      return (1-Pi)*Spi*Utn + Pi*(1-Sei)*Ufn +
-         (1-Pi)*(1-Spi)*(
-            (Pj-Pij)/(1-Pi)*Sej*Utp +
-            (1-Pi-Pj+Pij)/(1-Pi)*(1-Spj)*Ufp +
-            (1-Pi-Pj+Pij)/(1-Pi)*Spj*Utn +
-            (Pj-Pij)/(1-Pi)*(1-Sej)*Ufn
-         ) +
-         Pi*Sei*(
-            Pij/Pi*Sej*Utp +
-            (Pi-Pij)/Pi*(1-Spj)*Ufp +
-            (Pi-Pij)/Pi*Spj*Utn +
-            Pij/Pi*(1-Sej)*Ufn
-         );
-   }
-
-   EU11(Pi, Pj, Sei, Sej, Spi, Spj, Utp, Ufp, Utn, Ufn, Pij) {
-      if (Pij > Pi || Pj > (Pij + 1 - Pi)) {
-         this.logError(11)
-      }
-      // i
-      return (Pi-Pij)*(1-Sei)*Spj*Utn +
-            Pij*(1-Sei)*(1-Sej)*Ufn +
-            Pij*(1-Sei)*Sej*Utp +
-            (Pi-Pij)*(1-Sei)*(1-Spj)*Ufp +
-
-            (Pi-Pij)*Sei*Spj*Utn +
-            Pij*Sei*(1-Sej)*Ufn +
-            Pij*Sei*Sej*Utp +
-            (Pi-Pij)*Sei*(1-Spj)*Ufp +
-
-            (1-Pj-Pi+Pij)*Spi*Spj*Utn +
-            (Pj-Pij)*Spi*(1-Sej)*Ufn +
-            (Pj-Pij)*Spi*Sej*Utp +
-            (1-Pi-Pj+Pij)*Spi*(1-Sej)*Ufp +
-
-            (1-Pi-Pj+Pij)*(1-Spi)*Spj*Utn +
-            (Pi-Pij)*(1-Spi)*(1-Sej)*Ufn +
-            (Pi-Pij)*(1-Spi)*Sej*Utp +
-            (1-Pi-Pj+Pij)*(1-Spi)*(1-Spj)*Ufp;
+   private logError(e) {
+      console.error('error: ', e);
    }
 
    comparePeriods() {
@@ -850,39 +593,4 @@ export class TreesComponent implements OnInit {
    selectPeriod(period) {
       this.currentPeriod = period;
    }
-}
-
-interface Strategy {
-   id?: number;
-   name?: string;
-   paramsBounds?: ParameterWithBounds[];
-}
-
-interface ParameterWithValue extends ParameterWithBounds {
-   value: number;
-}
-
-interface ParameterWithBounds extends Parameter {
-   minBound: number;
-   maxBound: number;
-}
-
-interface Parameter {
-   code: string;
-   name: string;
-   minAllowed: number;
-   maxAllowed: number;
-}
-
-interface Period {
-   name: string;
-
-   strategy1: Strategy;
-   strategy2: Strategy;
-
-   periodData?: {
-      EUr: [number, number],
-      EU1: [number, number],
-      EU2: [number, number]
-   };
 }

@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import * as Highcharts from 'highcharts';
+import {Test,NewSample} from '../../interfaces';
 
 @Component({
    selector: 'app-tests-input',
@@ -210,18 +210,18 @@ export class TestsInputComponent implements OnInit {
    setTypeContinuous() {
       this.resultsType = 'continuous';
 
-      this.samples = [true, true, false, false, false, true, true, false];
+      // this.samples = [true, true, false, false, false, true, true, false];
 
-      this.tests = [
-         {
-            results: [6, 5, 3, 2, 1, 4, 5, 4]
-         },
-         {
-            results: [9, 4, 3, 1, 4, 6, 3, 1]
-         }
-      ];
+      // this.tests = [
+      //    {
+      //       results: [6, 5, 3, 2, 1, 4, 5, 4]
+      //    },
+      //    {
+      //       results: [9, 4, 3, 1, 4, 6, 3, 1]
+      //    }
+      // ];
 
-      // this.tests = [];
+      this.tests = [];
       this.dc.detectChanges();
    }
 
@@ -270,39 +270,4 @@ export class TestsInputComponent implements OnInit {
       this.showCurves = true;
    }
 
-}
-
-interface Test {
-   results: (boolean | number)[];
-
-   TP?: number;
-   TN?: number;
-   FP?: number;
-   FN?: number;
-
-   characteristics?: {
-      ac: number;
-      se: number;
-      sp: number;
-      ppv: number;
-      npv: number;
-      lrPositive: number;
-      lrNegative: number;
-      distance?: number;
-   };
-
-   optimum?: {
-      cutoff?: number;
-      distance?: number;
-      se?: number;
-      sp?: number;
-   };
-
-   chartData?: any;
-   chartDataItem?: any;
-}
-
-interface NewSample {
-   control: boolean;
-   testsResults: boolean[];
 }

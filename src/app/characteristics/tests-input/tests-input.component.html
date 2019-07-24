@@ -1,0 +1,156 @@
+<div class="test-type card">
+   <div class="label">Тип результату тесту</div>
+   <ng-select class="select"
+              [items]="testTypes"
+              bindValue="name"
+              [clearable]="false"
+              [(ngModel)]="resultsType"
+              (change)="setTestType(resultsType)"
+   ></ng-select>
+</div>
+
+<div class="card input-card">
+   <div class="table input-table">
+      <div class="row head">
+         <div class="td count">№ зразка</div>
+         <div class="td control">Контроль</div>
+         <div class="td test-result" *ngFor="let test of tests; let i = index">Діагностичний тест № {{i + 1}}</div>
+
+         <div class="td test-result new-test-header" *ngIf="showInputColumn">Діагностичний тест № {{tests.length + 1}}</div>
+      </div>
+
+      <div class="row complete-row" *ngFor="let sample of samples; let i = index">
+         <div class="td count">{{i + 1}}</div>
+         <div class="td control">{{sample ? '+' : '-'}}</div>
+         <div class="td test-result" *ngFor="let test of tests">
+            <span *ngIf="resultsType === 'binary'">{{test.results[i] ? '+' : '-'}}</span>
+            <span *ngIf="resultsType === 'continuous'">{{test.results[i]}}</span>
+         </div>
+
+         <div class="td new-test-result test-result" *ngIf="showInputColumn">
+            <div class="binary-result-input" *ngIf="resultsType === 'binary'">
+               <button class="positive"
+                       [class.active]="newTest[i]"
+                       (click)="newTest[i] = true; checkSaveState('column')"
+               >+</button>
+               <button class="negative"
+                       [class.active]="newTest[i] !== null && !newTest[i]"
+                       (click)="newTest[i] = false; checkSaveState('column')"
+               >-</button>
+            </div>
+
+            <div class="continuous-result-input" *ngIf="resultsType === 'continuous'">
+               <input type="number" [(ngModel)]="newTest[i]" (ngModelChange)="checkSaveState('column')">
+            </div>
+         </div>
+      </div>
+
+      <div class="row new-row" *ngIf="showInputRow">
+         <div class="td count">{{samples.length + 1}}</div>
+
+         <div class="td control">
+            <div class="binary-result-input">
+               <button class="positive"
+                       [class.active]="newSample.control"
+                       (click)="newSample.control = true; checkSaveState('row')"
+               ><span>+</span></button>
+               <button class="negative"
+                       [class.active]="newSample.control !== null && !newSample.control"
+                       (click)="newSample.control = false; checkSaveState('row')"
+               ><span>-</span></button>
+            </div>
+         </div>
+
+         <div class="td test-result" *ngFor="let test of tests; let i = index">
+            <div class="binary-result-input" *ngIf="resultsType === 'binary'">
+               <button class="positive"
+                       [class.active]="newSample.testsResults[i]"
+                       (click)="newSample.testsResults[i] = true; checkSaveState('row')"
+               >+</button>
+               <button class="negative"
+                       [class.active]="newSample.testsResults[i] !== null && !newSample.testsResults[i]"
+                       (click)="newSample.testsResults[i] = false; checkSaveState('row')"
+               >-</button>
+            </div>
+
+            <div class="continuous-result-input" *ngIf="resultsType === 'continuous'">
+               <input type="number" [(ngModel)]="newSample.testsResults[i]" (ngModelChange)="checkSaveState('row')">
+            </div>
+         </div>
+      </div>
+
+      <div class="controls">
+         <button class="add-row" *ngIf="!showInputRow && !showInputColumn" (click)="addRow()">Додати зразок</button>
+         <button class="add-column" *ngIf="!showInputColumn && !showInputRow" (click)="addTest()">Додати тест</button>
+         <button *ngIf="!showInputRow && !showInputColumn && resultsType === 'binary'" (click)="calculateAllTestsCharacteristics()" [disabled]="resultsType === 'continuous' && !cutOff">Обчислити характеристики</button>
+         <button class="high-btn" *ngIf="!showInputRow && !showInputColumn && resultsType === 'continuous'" (click)="calculateOptimalPair()">ROC-аналіз</button>
+
+         <button class="save" [disabled]="saveDisabled" *ngIf="showInputRow || showInputColumn" (click)="saveInput()">Зберегти</button>
+         <button class="cancel" *ngIf="showInputRow || showInputColumn" (click)="cancelInput()">Відміна</button>
+      </div>
+
+   </div>
+</div>
+
+<div class="card characteristics-card" *ngIf="resultsType === 'binary'">
+   <div class="table characteristics">
+      <div class="row head">
+         <div class="td"></div>
+         <div class="td" *ngFor="let test of tests; let i = index">Діагностичний тест № {{i+1}}</div>
+      </div>
+
+
+      <div class="row">
+         <div class="td">Точність</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.ac | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Чутливість</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.se | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Специфічність</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.sp | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Позитивна прогностична цінність</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.ppv | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Негативна прогностична цінність</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.npv | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Відношення правдоподібності позитивного результату</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.lrPositive | number}}</div>
+      </div>
+
+      <div class="row">
+         <div class="td">Відношення правдоподібності негативного результату</div>
+         <div class="td" *ngFor="let test of tests">{{test.characteristics?.lrNegative | number}}</div>
+      </div>
+   </div>
+</div>
+
+<div class="continuous-block card" *ngIf="this.resultsType === 'continuous' && showCurves">
+   <div class="calculation-results">
+      <div class="curves-plots" *ngFor="let test of tests, let i = index">
+         <div class="cutoff">
+            <div>Діагностичний тест № {{i+1}}</div>
+            <div>Оптимальне граничне значення діагностичного маркеру: {{test.optimum.cutoff | number}}</div>
+            <div>Чутливість: {{test.optimum.se | number}}</div>
+            <div>Специфічність: {{test.optimum.sp | number}}</div>
+            <div>Найкоротша відстань до точки (0;1): {{test.optimum.distance | number}}</div>
+         </div>
+
+         <div class="chart-wrapper">
+            <app-roc [index]="i" [chartData]="test.chartData"></app-roc>
+         </div>
+      </div>
+   </div>
+</div>

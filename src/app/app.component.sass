@@ -1,1 +1,21 @@
+@import "variables"
 
+.tests-input
+   font-size: 16px
+   font-family: "Dosis", Arial, Helvetica, sans-serif
+   flex-direction: column
+   background: $color3
+
+::ng-deep
+   .card
+      background: white
+      border-radius: 5px
+      box-shadow: 0 0 5px 0 gray
+      width: 1100px
+      margin: 10px
+      padding: 10px
+      justify-content: flex-start
+
+      &.input-card
+         align-items: flex-start
+         min-height: 190px
