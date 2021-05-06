@@ -46,7 +46,7 @@
       "@ng-select/ng-select": "^2.20.0",
       "electron-reload": "^1.4.0",
       "electron-updater": "^4.0.14",
-      "highcharts": "^7.1.2",
+      "highcharts": "^9.0.0",
       "highcharts-angular": "^2.4.0",
       "ng-select": "^1.0.2",
       "rxjs": "~6.4.0",
